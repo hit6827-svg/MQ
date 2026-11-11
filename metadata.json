@@ -1,0 +1,6 @@
+{
+  "name": "MathQuest",
+  "description": "Interactive mathematics learning and problem-solving workspace with MathJax rendering, deliberate practice solving sequences, and geometric particle canvas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,60 @@
+{
+  "entities": {
+    "Topic": {
+      "title": "Topic",
+      "description": "Mathematics topic category",
+      "type": "object",
+      "properties": {
+        "slug": { "type": "string", "maxLength": 64 },
+        "title": { "type": "string", "maxLength": 128 },
+        "description": { "type": "string", "maxLength": 512 },
+        "orderIndex": { "type": "number" }
+      },
+      "required": ["slug", "title", "description", "orderIndex"]
+    },
+    "Exercise": {
+      "title": "Exercise",
+      "description": "Curated mathematical problem with step-by-step solving sequences",
+      "type": "object",
+      "properties": {
+        "topicId": { "type": "string", "maxLength": 64 },
+        "title": { "type": "string", "maxLength": 128 },
+        "difficulty": { "type": "string", "enum": ["Beginner", "Intermediate", "Advanced", "Olympiad"] },
+        "latexStatement": { "type": "string", "maxLength": 4096 },
+        "targetSolution": { "type": "string", "maxLength": 2048 },
+        "hints": { "type": "array" },
+        "solvingSequences": { "type": "array" }
+      },
+      "required": ["topicId", "title", "difficulty", "latexStatement", "targetSolution", "solvingSequences"]
+    },
+    "HistoryLog": {
+      "title": "HistoryLog",
+      "description": "Record of a user solving attempt",
+      "type": "object",
+      "properties": {
+        "exerciseId": { "type": "string", "maxLength": 64 },
+        "topicId": { "type": "string", "maxLength": 64 },
+        "outcome": { "type": "string", "enum": ["success", "failed"] },
+        "pointsEarned": { "type": "number" },
+        "timeSpentSeconds": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["exerciseId", "outcome", "pointsEarned", "timeSpentSeconds", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/topics/{topicId}": {
+      "schema": "Topic",
+      "description": "Public read-only topics list"
+    },
+    "/exercises/{exerciseId}": {
+      "schema": "Exercise",
+      "description": "Public read-only curated exercises"
+    },
+    "/history_logs/{logId}": {
+      "schema": "HistoryLog",
+      "description": "User problem solving attempts log"
+    }
+  }
+}

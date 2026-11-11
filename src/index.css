@@ -1,0 +1,52 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  /* MathJax SVG styling on pure black background */
+  mjx-container {
+    color: #ffffff !important;
+    display: inline-block !important;
+    margin: 0 !important;
+    outline: none !important;
+  }
+
+  mjx-container[jax="SVG"][display="true"] {
+    display: block !important;
+    text-align: center !important;
+    margin: 1rem 0 !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.5rem 0;
+  }
+
+  mjx-container svg {
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
+}
+
+/* Custom scrollbars for pristine obsidian look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #262626;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #404040;
+}

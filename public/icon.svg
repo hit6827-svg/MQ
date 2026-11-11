@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="104" fill="#000000"/>
+  <!-- Geometric outer constellation lines -->
+  <line x1="120" y1="380" x2="256" y2="120" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+  <line x1="256" y1="120" x2="392" y2="380" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+  <line x1="120" y1="380" x2="392" y2="380" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+  <!-- Transversal mathematical segment -->
+  <line x1="188" y1="250" x2="324" y2="250" stroke="#ffffff" stroke-width="8" stroke-dasharray="8 8" stroke-linecap="round"/>
+  <line x1="256" y1="120" x2="256" y2="380" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+  <!-- Vertex nodes with dots on each side -->
+  <circle cx="256" cy="120" r="18" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+  <circle cx="120" cy="380" r="18" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+  <circle cx="392" cy="380" r="18" fill="#ffffff" stroke="#000000" stroke-width="6"/>
+  <circle cx="188" cy="250" r="12" fill="#ffffff" stroke="#000000" stroke-width="4"/>
+  <circle cx="324" cy="250" r="12" fill="#ffffff" stroke="#000000" stroke-width="4"/>
+  <circle cx="256" cy="250" r="14" fill="#10B981" stroke="#000000" stroke-width="4"/>
+  <circle cx="256" cy="380" r="12" fill="#ffffff" stroke="#000000" stroke-width="4"/>
+</svg>

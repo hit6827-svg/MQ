@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>MathQuest — Problem-Solving Workspace</title>
+    <meta name="description" content="Interactive mathematics learning and problem-solving workspace with MathJax rendering, deliberate practice solving sequences, and geometric particle canvas." />
+    <meta property="og:title" content="MathQuest — Problem-Solving Workspace" />
+    <meta property="og:description" content="Interactive mathematics learning and problem-solving workspace with MathJax rendering, deliberate practice solving sequences, and geometric particle canvas." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <!-- PWA & Mobile Web App Meta -->
+    <script>
+      // In AI Studio iframe environment, HMR is disabled. Handle Vite HMR connection cleanly.
+      (function() {
+        const OrigWebSocket = window.WebSocket;
+        if (!OrigWebSocket) return;
+        class SafeWebSocket extends EventTarget {
+          constructor(url, protocols) {
+            super();
+            if (protocols === 'vite-hmr' || protocols === 'vite-ping' || (typeof url === 'string' && url.includes('token='))) {
+              this.url = url;
+              this.readyState = 1; // OPEN
+              this.onopen = null;
+              this.onclose = null;
+              this.onerror = null;
+              this.onmessage = null;
+              setTimeout(() => {
+                const event = new Event('open');
+                if (typeof this.onopen === 'function') this.onopen(event);
+                this.dispatchEvent(event);
+              }, 0);
+            } else {
+              return new OrigWebSocket(url, protocols);
+            }
+          }
+          send() {}
+          close() {
+            this.readyState = 3;
+            const event = new CloseEvent('close', { code: 1000, reason: 'Normal' });
+            if (typeof this.onclose === 'function') this.onclose(event);
+            this.dispatchEvent(event);
+          }
+        }
+        SafeWebSocket.CONNECTING = 0;
+        SafeWebSocket.OPEN = 1;
+        SafeWebSocket.CLOSING = 2;
+        SafeWebSocket.CLOSED = 3;
+        window.WebSocket = SafeWebSocket;
+      })();
+    </script>
+    <meta name="theme-color" content="#000000" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="MathQuest" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- MathJax 3 Configuration -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        svg: {
+          fontCache: 'global'
+        },
+        options: {
+          enableMenu: false
+        }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  </head>
+  <body class="bg-black text-white antialiased selection:bg-neutral-800 selection:text-white min-h-screen overflow-x-hidden">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
