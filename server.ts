@@ -11,8 +11,25 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+function resolvePort(): number {
+  const portArgIdx = process.argv.indexOf('--port');
+  if (portArgIdx !== -1 && process.argv[portArgIdx + 1]) {
+    const parsed = Number(process.argv[portArgIdx + 1]);
+    if (!Number.isNaN(parsed) && parsed > 0) return parsed;
+  }
+  const envPort = process.env.PORT ? Number(process.env.PORT) : undefined;
+  const nginxPort = process.env.NGINX_PORT ? Number(process.env.NGINX_PORT) : undefined;
+  if (envPort && envPort !== nginxPort) {
+    return envPort;
+  }
+  if (process.env.DEFAULT_APP_PORT) {
+    return Number(process.env.DEFAULT_APP_PORT) || 3000;
+  }
+  return 3000;
+}
+
 const app = express();
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = resolvePort();
 
 app.use(express.json());
 
@@ -127,17 +144,32 @@ async function startServer() {
   const httpServer = http.createServer(app);
 
   if (!isProduction) {
-    // Development mode: Vite dev server middleware
-    const { createServer } = await import('vite');
-    const vite = await createServer({
-      server: {
-        middlewareMode: true,
-        hmr: false,
-      },
-      appType: 'spa',
+    // Initialize Vite asynchronously so port 3000 binds immediately for health checks
+    const vitePromise = import('vite').then(({ createServer }) =>
+      createServer({
+        server: {
+          middlewareMode: true,
+          hmr: false,
+          ws: false,
+        },
+        appType: 'spa',
+      })
+    );
+
+    app.use(async (req, res, next) => {
+      try {
+        const vite = await vitePromise;
+        vite.middlewares(req, res, next);
+      } catch (err) {
+        next(err);
+      }
     });
 
-    app.use(vite.middlewares);
+    // Warm up Vite in background and log any config failure immediately
+    vitePromise.catch((err) => {
+      console.error('Fatal error initializing Vite middleware:', err);
+      process.exit(1);
+    });
   } else {
     // Production mode: serve built assets from dist
     app.use(express.static(path.resolve(__dirname, 'dist')));

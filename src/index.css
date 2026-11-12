@@ -2,51 +2,67 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
+  html,
   body {
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: #000000;
     color: #ffffff;
+    overflow-x: clip;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Cancel visible scrollbars globally so UI navigation is button-driven */
+  *,
+  *::before,
+  *::after {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
-  /* MathJax SVG styling on pure black background */
+  /* MathJax SVG styling on pure black background, responsive on small/medium devices */
   mjx-container {
     color: #ffffff !important;
     display: inline-block !important;
     margin: 0 !important;
     outline: none !important;
+    max-width: 100%;
   }
 
   mjx-container[jax="SVG"][display="true"] {
     display: block !important;
     text-align: center !important;
-    margin: 1rem 0 !important;
+    margin: 0.75rem 0 !important;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 0.5rem 0;
+    padding: 0.35rem 0;
+    max-width: 100%;
   }
 
   mjx-container svg {
     fill: currentColor !important;
     stroke: currentColor !important;
+    max-width: 100%;
+    height: auto;
   }
 }
 
-/* Custom scrollbars for pristine obsidian look */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-::-webkit-scrollbar-track {
-  background: #000000;
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
-::-webkit-scrollbar-thumb {
-  background: #262626;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #404040;
-}
+

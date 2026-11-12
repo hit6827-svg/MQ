@@ -102,7 +102,7 @@ export const MathJaxRenderer: React.FC<MathJaxRendererProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`math-rendered overflow-x-auto my-2 text-white/95 leading-relaxed ${className}`}
+      className={`math-rendered overflow-x-auto no-scrollbar max-w-full my-2 text-white/95 leading-relaxed ${className}`}
     />
   );
 };

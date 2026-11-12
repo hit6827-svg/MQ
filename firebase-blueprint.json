@@ -1,5 +1,21 @@
 {
   "entities": {
+    "UserAccount": {
+      "title": "UserAccount",
+      "description": "Private authenticated user profile and 5-hour cadence schedule state",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "photoURL": { "type": "string", "maxLength": 512 },
+        "scheduleStartedAt": { "type": "number" },
+        "scheduleFastForwardHours": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "displayName", "email", "photoURL", "scheduleStartedAt", "scheduleFastForwardHours", "createdAt", "updatedAt"]
+    },
     "Topic": {
       "title": "Topic",
       "description": "Mathematics topic category",
@@ -29,21 +45,27 @@
     },
     "HistoryLog": {
       "title": "HistoryLog",
-      "description": "Record of a user solving attempt",
+      "description": "Record of an authenticated user solving attempt",
       "type": "object",
       "properties": {
+        "userId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
         "exerciseId": { "type": "string", "maxLength": 64 },
+        "exerciseTitle": { "type": "string", "maxLength": 128 },
         "topicId": { "type": "string", "maxLength": 64 },
         "outcome": { "type": "string", "enum": ["success", "failed"] },
         "pointsEarned": { "type": "number" },
         "timeSpentSeconds": { "type": "number" },
         "timestamp": { "type": "string", "format": "date-time" },
-        "userId": { "type": "string", "maxLength": 128 }
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["exerciseId", "outcome", "pointsEarned", "timeSpentSeconds", "timestamp"]
+      "required": ["userId", "exerciseId", "exerciseTitle", "topicId", "outcome", "pointsEarned", "timeSpentSeconds", "timestamp", "createdAt"]
     }
   },
   "firestore": {
+    "/users/{userId}": {
+      "schema": "UserAccount",
+      "description": "Owner-only user profile and cadence settings"
+    },
     "/topics/{topicId}": {
       "schema": "Topic",
       "description": "Public read-only topics list"
@@ -54,7 +76,7 @@
     },
     "/history_logs/{logId}": {
       "schema": "HistoryLog",
-      "description": "User problem solving attempts log"
+      "description": "Authenticated user problem solving attempts log"
     }
   }
 }
