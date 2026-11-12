@@ -55,6 +55,10 @@ function mapAuthError(err: unknown): string {
   if (code === 'auth/cancelled-popup-request') {
     return 'Sign-in request was superseded. Please try again.';
   }
+  if (code === 'auth/unauthorized-domain') {
+    const host = typeof window !== 'undefined' ? window.location.hostname : 'this domain';
+    return `Domain "${host}" is not authorized in Firebase Auth. Add it under Firebase Console -> Authentication -> Settings -> Authorized domains.`;
+  }
   if (code === 'auth/network-request-failed') {
     return 'Network error during sign-in. Check your connection and try again.';
   }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { TopicSlug, Exercise, HistoryLog, UserStats } from './types/math.ts';
 import { CURATED_EXERCISES } from './data/curatedExercises.ts';
 import { getLocalizedTopics, getLocalizedExercises } from './data/curatedExercisesFr.ts';
@@ -39,6 +39,7 @@ export default function App() {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [historyLogs, setHistoryLogs] = useState<HistoryLog[]>([]);
   const [schedule, setSchedule] = useState<ScheduleState>(calculateScheduleState());
+  const hasRestBackendRef = useRef(false);
 
   const localizedTopics = getLocalizedTopics(language);
   const localizedExercises = getLocalizedExercises(language);
@@ -135,9 +136,17 @@ export default function App() {
       return () => unsubscribe();
     }
 
-    // 3. Guest mode fallback: REST API endpoint
+    // 3. Guest mode fallback: REST API endpoint (only when Express backend serves JSON, skipped cleanly on static Netlify)
     fetch('/api/history')
-      .then((res) => (res.ok ? res.json() : null))
+      .then((res) => {
+        const contentType = res.headers.get('content-type') || '';
+        if (res.ok && contentType.includes('application/json')) {
+          hasRestBackendRef.current = true;
+          return res.json();
+        }
+        hasRestBackendRef.current = false;
+        return null;
+      })
       .then((data) => {
         if (data && Array.isArray(data.logs) && data.logs.length > 0) {
           setHistoryLogs((prev) => {
@@ -151,8 +160,8 @@ export default function App() {
           });
         }
       })
-      .catch((err) => {
-        console.warn('Server history fetch fallback to local:', err);
+      .catch(() => {
+        hasRestBackendRef.current = false;
       });
   }, [isAuthReady, user]);
 
@@ -195,16 +204,18 @@ export default function App() {
       console.warn('Could not cache log:', e);
     }
 
-    // Post to Express REST API
-    fetch('/api/history/log', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        exerciseId: selectedExercise.id,
-        outcome,
-        timeSpentSeconds,
-      }),
-    }).catch((err) => console.warn('REST log sync deferred:', err));
+    // Post to Express REST API only when running with the Express backend
+    if (hasRestBackendRef.current) {
+      fetch('/api/history/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          exerciseId: selectedExercise.id,
+          outcome,
+          timeSpentSeconds,
+        }),
+      }).catch((err) => console.warn('REST log sync deferred:', err));
+    }
 
     // Persist to owner-scoped Firestore collection when signed in
     if (user) {

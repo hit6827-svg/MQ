@@ -1,12 +1,30 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
-import firebaseConfig from '../../firebase-applet-config.json';
+import bundledFirebaseConfig from '../../firebase-applet-config.json';
+
+const env = import.meta.env;
+
+// Allow Netlify / Vite environment variable overrides while defaulting to the bundled Firebase config
+const firebaseConfig = {
+  apiKey: env.VITE_FIREBASE_API_KEY || bundledFirebaseConfig.apiKey,
+  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || bundledFirebaseConfig.authDomain,
+  projectId: env.VITE_FIREBASE_PROJECT_ID || bundledFirebaseConfig.projectId,
+  appId: env.VITE_FIREBASE_APP_ID || bundledFirebaseConfig.appId,
+  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || bundledFirebaseConfig.storageBucket,
+  messagingSenderId:
+    env.VITE_FIREBASE_MESSAGING_SENDER_ID || bundledFirebaseConfig.messagingSenderId,
+  firestoreDatabaseId:
+    env.VITE_FIREBASE_FIRESTORE_DATABASE_ID || bundledFirebaseConfig.firestoreDatabaseId,
+};
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// CRITICAL: Initialize Firestore with firestoreDatabaseId from configuration
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+// CRITICAL: Initialize Firestore with firestoreDatabaseId from configuration (or default DB if '(default)')
+export const db =
+  firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)'
+    ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
+    : getFirestore(app);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
