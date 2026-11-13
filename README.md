@@ -113,17 +113,6 @@ Ensure your deployment domain(s) are added to **Firebase Console → Authenticat
 
 ---
 
-## Deploying to Netlify
-
-`netlify.toml` and `public/_redirects` are preconfigured for static SPA hosting:
-
-- **Build command**: `npm run build`
-- **Publish directory**: `dist`
-- **Security & Popup Headers**: Configures `Cross-Origin-Opener-Policy: same-origin-allow-popups` so Firebase Google OAuth popups function properly, along with `no-cache` headers for `/sw.js` and `/manifest.webmanifest`.
-- **Optional Environment Variables**: Add any `VITE_FIREBASE_*` overrides under **Netlify Site Settings → Environment variables**.
-
----
-
 ## Project Structure
 
 ```text
