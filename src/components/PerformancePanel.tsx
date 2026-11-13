@@ -57,7 +57,7 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="min-h-[40px] px-3 py-1.5 rounded-none bg-neutral-950/75 hover:bg-neutral-900 backdrop-blur-md border border-white/15 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5 transition-colors shrink-0"
+          className="min-h-[40px] px-3 py-1.5 rounded-none bg-neutral-950 hover:bg-neutral-900 border border-white/15 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5 transition-colors shrink-0"
           aria-label={t.nav.closePanel}
         >
           <X className="w-4 h-4" />
@@ -66,7 +66,7 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
       </div>
 
       {/* Sync Indicator (Non-button informational banner) */}
-      <div className="px-4 py-2.5 rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15 flex items-center justify-between gap-3 text-xs">
+      <div className="px-4 py-2.5 rounded-none bg-neutral-950/90 border border-white/15 flex items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2 text-white/75">
           <Cloud className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>
@@ -81,10 +81,10 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
       </div>
 
       {/* Current Rank Card + Next Promotion Checklist */}
-      <section className="p-4 sm:p-6 rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15 space-y-4">
+      <section className="p-4 sm:p-6 rounded-none bg-neutral-950/90 border border-white/15 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-none bg-black/70 backdrop-blur-md border border-white/20 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-none bg-black border border-white/20 flex items-center justify-center shrink-0">
               <Award className="w-6 h-6 text-emerald-400" />
             </div>
             <div>
@@ -118,7 +118,7 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
 
         {/* Next Promotion Requirements */}
         {rankEval.nextRank ? (
-          <div className="p-3.5 rounded-none bg-black/65 backdrop-blur-md border border-white/15 space-y-2">
+          <div className="p-3.5 rounded-none bg-black/80 border border-white/15 space-y-2">
             <div className="text-xs font-semibold text-white">
               {t.performance.nextPromotion}{' '}
               <span className="text-emerald-400 font-mono">
@@ -142,7 +142,7 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
             </ul>
           </div>
         ) : (
-          <div className="p-3.5 rounded-none bg-emerald-950/35 backdrop-blur-md border border-emerald-500/35 text-xs font-semibold text-emerald-300">
+          <div className="p-3.5 rounded-none bg-emerald-950/50 border border-emerald-500/35 text-xs font-semibold text-emerald-300">
             {t.performance.highestRankReached}
           </div>
         )}
@@ -150,7 +150,7 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
 
       {/* Aggregate Proof Mastery Metrics (NO attempt logs, NO points) */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-4 rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15">
+        <div className="p-4 rounded-none bg-neutral-950/90 border border-white/15">
           <span className="text-[11px] font-mono text-white/50 block">
             {t.performance.proofsSolved}
           </span>
@@ -159,7 +159,7 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
           </span>
         </div>
 
-        <div className="p-4 rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15">
+        <div className="p-4 rounded-none bg-neutral-950/90 border border-white/15">
           <span className="text-[11px] font-mono text-white/50 block">
             {t.performance.verifiedSessions}
           </span>
@@ -168,7 +168,7 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
           </span>
         </div>
 
-        <div className="p-4 rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15">
+        <div className="p-4 rounded-none bg-neutral-950/90 border border-white/15">
           <span className="text-[11px] font-mono text-white/50 block">
             {t.performance.reviewedSessions}
           </span>
@@ -177,7 +177,7 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
           </span>
         </div>
 
-        <div className="p-4 rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15">
+        <div className="p-4 rounded-none bg-neutral-950/90 border border-white/15">
           <span className="text-[11px] font-mono text-white/50 block">
             {t.performance.verificationRate}
           </span>
@@ -199,7 +199,7 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
             return (
               <div
                 key={track.id}
-                className="p-4 sm:p-5 rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15 space-y-4"
+                className="p-4 sm:p-5 rounded-none bg-neutral-950/90 border border-white/15 space-y-4"
               >
                 <div className="flex items-center justify-between gap-2 pb-3 border-b border-white/10">
                   <h3 className="text-sm sm:text-base font-bold text-white">{track.title}</h3>
@@ -222,7 +222,7 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
                     return (
                       <div
                         key={ex.id}
-                        className="px-3 py-2 rounded-none bg-black/65 backdrop-blur-md border border-white/15 flex items-center justify-between gap-2"
+                        className="px-3 py-2 rounded-none bg-black/80 border border-white/15 flex items-center justify-between gap-2"
                       >
                         <div className="flex items-center gap-2 min-w-0">
                           {solved ? (
@@ -260,7 +260,7 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
                     return (
                       <div
                         key={ex.id}
-                        className="px-3 py-2 rounded-none bg-black/55 backdrop-blur-md border border-white/10 flex items-center justify-between gap-2"
+                        className="px-3 py-2 rounded-none bg-black/70 border border-white/10 flex items-center justify-between gap-2"
                       >
                         <div className="flex items-center gap-2 min-w-0">
                           {!prog.isAdvancedUnlocked ? (
@@ -297,7 +297,7 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
       </section>
 
       {/* Full Rank Ladder Summary */}
-      <section className="p-4 sm:p-5 rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15 space-y-3">
+      <section className="p-4 sm:p-5 rounded-none bg-neutral-950/90 border border-white/15 space-y-3">
         <h2 className="text-sm sm:text-base font-bold text-white pb-2 border-b border-white/10">
           {t.performance.ladderSection}
         </h2>
@@ -308,12 +308,12 @@ export const PerformancePanel: React.FC<PerformancePanelProps> = ({
             return (
               <div
                 key={tier.id}
-                className={`p-3 rounded-none border space-y-1 backdrop-blur-md ${
+                className={`p-3 rounded-none border space-y-1 ${
                   isCurrent
                     ? 'bg-white text-black border-white'
                     : isReached
-                    ? 'bg-black/70 border-emerald-500/35 text-white'
-                    : 'bg-black/50 border-white/10 text-white/55'
+                    ? 'bg-black/80 border-emerald-500/35 text-white'
+                    : 'bg-black/65 border-white/10 text-white/55'
                 }`}
               >
                 <div className="text-[11px] font-mono font-bold">

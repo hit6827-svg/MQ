@@ -256,10 +256,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-black text-white relative flex flex-col font-sans selection:bg-neutral-800">
-      {/* Subtle static dark ambient depth (zero particles) for frosted glass blur */}
+      {/* Subtle static dark ambient depth (zero particles) */}
       <div
         aria-hidden="true"
-        className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.06),transparent_55%),radial-gradient(ellipse_at_bottom_left,rgba(255,255,255,0.03),transparent_55%)]"
+        className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.06),transparent_55%),radial-gradient(ellipse_at_bottom_left,rgba(255,255,255,0.03),transparent_55%)]"
       />
 
       {/* Persistent Navigation Bar — Always visible on every screen and state with strictly 3 items */}
@@ -308,7 +308,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setViewMode('overview')}
-                className="min-h-[38px] px-3 py-1.5 rounded-none bg-neutral-950/75 hover:bg-neutral-900 backdrop-blur-md border border-white/15 text-xs font-medium text-white/85 hover:text-white inline-flex items-center gap-1.5 transition-colors"
+                className="min-h-[38px] px-3 py-1.5 rounded-none bg-neutral-950 hover:bg-neutral-900 border border-white/15 text-xs font-medium text-white/85 hover:text-white inline-flex items-center gap-1.5 transition-colors"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>{t.tracks.backToTracks}</span>
@@ -324,12 +324,12 @@ export default function App() {
                       key={lvl}
                       type="button"
                       onClick={() => handleSwitchLevel(lvl)}
-                      className={`min-h-[38px] px-3.5 py-1.5 rounded-none text-xs font-medium border backdrop-blur-md transition-all inline-flex items-center gap-1.5 ${
+                      className={`min-h-[38px] px-3.5 py-1.5 rounded-none text-xs font-medium border transition-colors inline-flex items-center gap-1.5 ${
                         isActive
                           ? 'bg-white text-black border-white font-semibold'
                           : isLocked
-                          ? 'bg-neutral-950/65 text-amber-300/80 border-amber-500/30 border-dashed hover:border-amber-400/50'
-                          : 'bg-neutral-950/75 text-white/75 border-white/15 hover:text-white hover:border-white/35'
+                          ? 'bg-neutral-950 text-amber-300/80 border-amber-500/30 border-dashed hover:border-amber-400/50'
+                          : 'bg-neutral-950 text-white/75 border-white/15 hover:text-white hover:border-white/35'
                       }`}
                     >
                       {isLocked && <Lock className="w-3.5 h-3.5 shrink-0" />}
@@ -358,7 +358,7 @@ export default function App() {
                   type="button"
                   onClick={handlePreviousExercise}
                   disabled={!hasPrevious}
-                  className="min-h-[40px] min-w-[40px] px-2.5 py-1.5 rounded-none bg-neutral-950/75 backdrop-blur-md border border-white/15 text-white/80 hover:text-white hover:border-white/35 disabled:opacity-30 disabled:pointer-events-none transition-all flex items-center justify-center"
+                  className="min-h-[40px] min-w-[40px] px-2.5 py-1.5 rounded-none bg-neutral-950 border border-white/15 text-white/80 hover:text-white hover:border-white/35 disabled:opacity-30 disabled:pointer-events-none transition-colors flex items-center justify-center"
                   aria-label={t.tracks.prevProblem}
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -375,12 +375,12 @@ export default function App() {
                       key={ex.id}
                       type="button"
                       onClick={() => setSelectedExerciseId(ex.id)}
-                      className={`flex items-center justify-center gap-1.5 min-h-[40px] px-3 py-1.5 rounded-none text-xs font-medium border backdrop-blur-md transition-all whitespace-nowrap flex-1 sm:flex-initial ${
+                      className={`flex items-center justify-center gap-1.5 min-h-[40px] px-3 py-1.5 rounded-none text-xs font-medium border transition-colors whitespace-nowrap flex-1 sm:flex-initial ${
                         isSelected
-                          ? 'bg-white text-black font-semibold border-white shadow-md'
+                          ? 'bg-white text-black font-semibold border-white'
                           : unlocked
-                          ? 'bg-neutral-950/75 text-white/75 hover:text-white border-white/15 hover:border-white/35'
-                          : 'bg-neutral-950/50 text-white/45 hover:text-white/70 border-white/10 border-dashed'
+                          ? 'bg-neutral-950 text-white/75 hover:text-white border-white/15 hover:border-white/35'
+                          : 'bg-neutral-950/70 text-white/45 hover:text-white/70 border-white/10 border-dashed'
                       }`}
                     >
                       {!unlocked ? (
@@ -403,7 +403,7 @@ export default function App() {
                   type="button"
                   onClick={handleNextExercise}
                   disabled={!hasNext}
-                  className="min-h-[40px] min-w-[40px] px-2.5 py-1.5 rounded-none bg-neutral-950/75 backdrop-blur-md border border-white/15 text-white/80 hover:text-white hover:border-white/35 disabled:opacity-30 disabled:pointer-events-none transition-all flex items-center justify-center"
+                  className="min-h-[40px] min-w-[40px] px-2.5 py-1.5 rounded-none bg-neutral-950 border border-white/15 text-white/80 hover:text-white hover:border-white/35 disabled:opacity-30 disabled:pointer-events-none transition-colors flex items-center justify-center"
                   aria-label={t.tracks.nextProblemShort}
                 >
                   <ChevronRight className="w-4 h-4" />

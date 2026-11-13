@@ -26,12 +26,12 @@ export const TopBar: React.FC<TopBarProps> = ({
   const firstName = user?.displayName?.split(' ')[0] || '';
 
   return (
-    <header className="sticky top-0 z-50 bg-black/75 backdrop-blur-xl border-b border-white/15 px-3 sm:px-6 py-2.5 sm:py-3">
+    <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-md transform-gpu border-b border-white/15 px-3 sm:px-6 py-2.5 sm:py-3">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
         {/* Non-interactive Brand Identity & Rank Indicator */}
         <div className="flex items-center justify-between sm:justify-start gap-3">
           <div className="flex items-center gap-2.5 select-none">
-            <div className="w-8 h-8 rounded-none bg-neutral-950/80 backdrop-blur-md border border-white/25 flex items-center justify-center text-white font-bold text-sm tracking-tighter shrink-0">
+            <div className="w-8 h-8 rounded-none bg-neutral-950 border border-white/25 flex items-center justify-center text-white font-bold text-sm tracking-tighter shrink-0">
               <span className="text-white font-mono">MQ</span>
             </div>
             <span className="text-lg sm:text-xl font-bold tracking-tight text-white whitespace-nowrap">
@@ -39,7 +39,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             </span>
           </div>
 
-          <span className="text-[11px] font-mono text-white/65 border border-white/15 bg-neutral-950/70 backdrop-blur-md px-2 py-0.5 rounded-none tabular-nums whitespace-nowrap">
+          <span className="text-[11px] font-mono text-white/65 border border-white/15 bg-neutral-950 px-2 py-0.5 rounded-none tabular-nums whitespace-nowrap">
             R{currentRank.rankNumber} · {currentRank.name}
           </span>
         </div>
@@ -54,10 +54,10 @@ export const TopBar: React.FC<TopBarProps> = ({
             type="button"
             onClick={() => onToggleSection('account')}
             aria-pressed={activeSection === 'account'}
-            className={`min-h-[40px] px-2.5 sm:px-3.5 py-1.5 rounded-none text-xs font-medium border transition-all flex items-center justify-center gap-1.5 whitespace-nowrap ${
+            className={`min-h-[40px] px-2.5 sm:px-3.5 py-1.5 rounded-none text-xs font-medium border transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap ${
               activeSection === 'account'
-                ? 'bg-white text-black border-white font-semibold shadow-sm'
-                : 'bg-neutral-950/70 backdrop-blur-md text-white/80 hover:text-white border-white/15 hover:border-white/35'
+                ? 'bg-white text-black border-white font-semibold'
+                : 'bg-neutral-950/90 text-white/80 hover:text-white border-white/15 hover:border-white/35'
             }`}
           >
             {isAuthReady && user?.photoURL ? (
@@ -78,10 +78,10 @@ export const TopBar: React.FC<TopBarProps> = ({
             type="button"
             onClick={() => onToggleSection('how_it_works')}
             aria-pressed={activeSection === 'how_it_works'}
-            className={`min-h-[40px] px-2.5 sm:px-3.5 py-1.5 rounded-none text-xs font-medium border transition-all flex items-center justify-center gap-1.5 whitespace-nowrap ${
+            className={`min-h-[40px] px-2.5 sm:px-3.5 py-1.5 rounded-none text-xs font-medium border transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap ${
               activeSection === 'how_it_works'
-                ? 'bg-white text-black border-white font-semibold shadow-sm'
-                : 'bg-neutral-950/70 backdrop-blur-md text-white/80 hover:text-white border-white/15 hover:border-white/35'
+                ? 'bg-white text-black border-white font-semibold'
+                : 'bg-neutral-950/90 text-white/80 hover:text-white border-white/15 hover:border-white/35'
             }`}
           >
             <HelpCircle className="w-3.5 h-3.5 shrink-0" />
@@ -93,10 +93,10 @@ export const TopBar: React.FC<TopBarProps> = ({
             type="button"
             onClick={() => onToggleSection('performance')}
             aria-pressed={activeSection === 'performance'}
-            className={`min-h-[40px] px-2.5 sm:px-3.5 py-1.5 rounded-none text-xs font-medium border transition-all flex items-center justify-center gap-1.5 whitespace-nowrap ${
+            className={`min-h-[40px] px-2.5 sm:px-3.5 py-1.5 rounded-none text-xs font-medium border transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap ${
               activeSection === 'performance'
-                ? 'bg-white text-black border-white font-semibold shadow-sm'
-                : 'bg-neutral-950/70 backdrop-blur-md text-white/80 hover:text-white border-white/15 hover:border-white/35'
+                ? 'bg-white text-black border-white font-semibold'
+                : 'bg-neutral-950/90 text-white/80 hover:text-white border-white/15 hover:border-white/35'
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5 shrink-0" />

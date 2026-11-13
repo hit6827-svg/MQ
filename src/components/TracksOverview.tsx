@@ -30,7 +30,7 @@ export const TracksOverview: React.FC<TracksOverviewProps> = ({
     <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-6 sm:py-10 relative z-10 space-y-6 sm:space-y-8">
       {/* Curriculum Intro */}
       <section className="max-w-3xl space-y-2.5">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-none bg-neutral-950/75 backdrop-blur-md border border-white/15 text-[11px] font-mono text-white/75 tracking-wider uppercase">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-none bg-neutral-950 border border-white/15 text-[11px] font-mono text-white/75 tracking-wider uppercase">
           <span className="w-1.5 h-1.5 rounded-none bg-emerald-400" />
           <span>{t.tracks.badge}</span>
         </div>
@@ -57,13 +57,13 @@ export const TracksOverview: React.FC<TracksOverviewProps> = ({
           return (
             <div
               key={track.id}
-              className="rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15 p-4 sm:p-6 flex flex-col justify-between gap-5 shadow-xl"
+              className="rounded-none bg-neutral-950/90 border border-white/15 p-4 sm:p-6 flex flex-col justify-between gap-5"
             >
               {/* Track Header */}
               <div className="space-y-2.5 pb-4 border-b border-white/10">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-none bg-black/70 backdrop-blur-md border border-white/20 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-none bg-black border border-white/20 flex items-center justify-center shrink-0">
                       <Icon className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -82,7 +82,7 @@ export const TracksOverview: React.FC<TracksOverviewProps> = ({
               </div>
 
               {/* Level 1: Basic */}
-              <div className="p-3.5 sm:p-4 rounded-none bg-black/65 backdrop-blur-md border border-white/15 space-y-3">
+              <div className="p-3.5 sm:p-4 rounded-none bg-black/80 border border-white/15 space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2">
@@ -110,7 +110,7 @@ export const TracksOverview: React.FC<TracksOverviewProps> = ({
                         key={ex.id}
                         type="button"
                         onClick={() => onSelectExercise(ex)}
-                        className="w-full min-h-[44px] px-3 py-2.5 rounded-none bg-neutral-950/75 hover:bg-neutral-900/90 backdrop-blur-md border border-white/15 hover:border-white/35 text-left flex items-center justify-between gap-3 transition-all group"
+                        className="w-full min-h-[44px] px-3 py-2.5 rounded-none bg-neutral-950 hover:bg-neutral-900 border border-white/15 hover:border-white/35 text-left flex items-center justify-between gap-3 transition-colors group"
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
                           {isSolved ? (
@@ -136,10 +136,10 @@ export const TracksOverview: React.FC<TracksOverviewProps> = ({
 
               {/* Level 2: Advanced (Locked until Basic completed) */}
               <div
-                className={`p-3.5 sm:p-4 rounded-none border space-y-3 transition-colors backdrop-blur-md ${
+                className={`p-3.5 sm:p-4 rounded-none border space-y-3 transition-colors ${
                   prog.isAdvancedUnlocked
-                    ? 'bg-black/65 border-white/20'
-                    : 'bg-neutral-950/55 border-white/15 border-dashed'
+                    ? 'bg-black/80 border-white/20'
+                    : 'bg-neutral-950/70 border-white/15 border-dashed'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -172,7 +172,7 @@ export const TracksOverview: React.FC<TracksOverviewProps> = ({
 
                 {!prog.isAdvancedUnlocked ? (
                   <div className="space-y-2.5">
-                    <div className="p-2.5 rounded-none bg-black/75 backdrop-blur-md border border-amber-500/30 space-y-1.5">
+                    <div className="p-2.5 rounded-none bg-black/85 border border-amber-500/30 space-y-1.5">
                       <p className="text-[11px] font-medium text-amber-200">
                         {t.tracks.unlockRequirement}
                       </p>
@@ -221,7 +221,7 @@ export const TracksOverview: React.FC<TracksOverviewProps> = ({
                           key={ex.id}
                           type="button"
                           onClick={() => onSelectExercise(ex)}
-                          className="w-full min-h-[44px] px-3 py-2.5 rounded-none bg-neutral-950/75 hover:bg-neutral-900/90 backdrop-blur-md border border-white/15 hover:border-white/35 text-left flex items-center justify-between gap-3 transition-all group"
+                          className="w-full min-h-[44px] px-3 py-2.5 rounded-none bg-neutral-950 hover:bg-neutral-900 border border-white/15 hover:border-white/35 text-left flex items-center justify-between gap-3 transition-colors group"
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             {isSolved ? (
@@ -252,7 +252,7 @@ export const TracksOverview: React.FC<TracksOverviewProps> = ({
                   <button
                     type="button"
                     onClick={() => onSelectExercise(nextAdvanced)}
-                    className="w-full min-h-[44px] py-2.5 px-4 rounded-none bg-white hover:bg-neutral-200 text-black font-semibold text-xs flex items-center justify-center gap-2 transition-all"
+                    className="w-full min-h-[44px] py-2.5 px-4 rounded-none bg-white hover:bg-neutral-200 text-black font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
                   >
                     <span>{t.tracks.exploreAdvanced}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -262,7 +262,7 @@ export const TracksOverview: React.FC<TracksOverviewProps> = ({
                     <button
                       type="button"
                       onClick={() => onSelectExercise(nextBasic)}
-                      className="w-full min-h-[44px] py-2.5 px-4 rounded-none bg-white hover:bg-neutral-200 text-black font-semibold text-xs flex items-center justify-center gap-2 transition-all"
+                      className="w-full min-h-[44px] py-2.5 px-4 rounded-none bg-white hover:bg-neutral-200 text-black font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
                     >
                       <span>{t.tracks.enterTrack}</span>
                       <ArrowRight className="w-4 h-4" />

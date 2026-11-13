@@ -52,7 +52,7 @@ export const HowItWorksPanel: React.FC<HowItWorksPanelProps> = ({ onClose, rankE
         <button
           type="button"
           onClick={onClose}
-          className="min-h-[40px] px-3 py-1.5 rounded-none bg-neutral-950/75 hover:bg-neutral-900 backdrop-blur-md border border-white/15 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5 transition-colors shrink-0"
+          className="min-h-[40px] px-3 py-1.5 rounded-none bg-neutral-950 hover:bg-neutral-900 border border-white/15 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5 transition-colors shrink-0"
           aria-label={t.nav.closePanel}
         >
           <X className="w-4 h-4" />
@@ -67,9 +67,9 @@ export const HowItWorksPanel: React.FC<HowItWorksPanelProps> = ({ onClose, rankE
           return (
             <div
               key={item.title}
-              className="p-4 sm:p-5 rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15 space-y-2.5"
+              className="p-4 sm:p-5 rounded-none bg-neutral-950/90 border border-white/15 space-y-2.5"
             >
-              <div className="w-9 h-9 rounded-none bg-black/70 backdrop-blur-md border border-white/15 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-none bg-black border border-white/15 flex items-center justify-center">
                 <Icon className="w-4 h-4 text-white/85" />
               </div>
               <h2 className="text-sm font-bold text-white">{item.title}</h2>
@@ -80,7 +80,7 @@ export const HowItWorksPanel: React.FC<HowItWorksPanelProps> = ({ onClose, rankE
       </section>
 
       {/* Full Rank 1 -> Rank 5 Ladder */}
-      <section className="p-4 sm:p-6 rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15 space-y-4">
+      <section className="p-4 sm:p-6 rounded-none bg-neutral-950/90 border border-white/15 space-y-4">
         <h2 className="text-sm sm:text-base font-bold text-white pb-3 border-b border-white/10">
           {t.howItWorks.ladderTitle}
         </h2>
@@ -93,12 +93,12 @@ export const HowItWorksPanel: React.FC<HowItWorksPanelProps> = ({ onClose, rankE
             return (
               <div
                 key={tier.id}
-                className={`p-3.5 sm:p-4 rounded-none border backdrop-blur-md transition-colors ${
+                className={`p-3.5 sm:p-4 rounded-none border transition-colors ${
                   isCurrent
                     ? 'bg-white/15 border-white/45'
                     : isAchieved
-                    ? 'bg-black/70 border-emerald-500/30'
-                    : 'bg-black/55 border-white/10'
+                    ? 'bg-black/80 border-emerald-500/30'
+                    : 'bg-black/65 border-white/10'
                 }`}
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">

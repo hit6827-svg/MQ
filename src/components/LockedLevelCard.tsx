@@ -22,8 +22,8 @@ export const LockedLevelCard: React.FC<LockedLevelCardProps> = ({
   const nextBasic = trackProgress.missingBasicExercises[0] || trackProgress.basicExercises[0];
 
   return (
-    <div className="p-5 sm:p-8 lg:p-12 rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15 shadow-2xl text-center space-y-6 max-w-2xl mx-auto">
-      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-none bg-black/70 backdrop-blur-md border border-amber-500/35 flex items-center justify-center mx-auto">
+    <div className="p-5 sm:p-8 lg:p-12 rounded-none bg-neutral-950/90 border border-white/15 text-center space-y-6 max-w-2xl mx-auto">
+      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-none bg-black border border-amber-500/35 flex items-center justify-center mx-auto">
         <Lock className="w-7 h-7 text-amber-400" />
       </div>
 
@@ -39,7 +39,7 @@ export const LockedLevelCard: React.FC<LockedLevelCardProps> = ({
         </p>
       </div>
 
-      <div className="p-4 rounded-none bg-black/65 backdrop-blur-md border border-white/15 text-left space-y-3">
+      <div className="p-4 rounded-none bg-black/80 border border-white/15 text-left space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono border-b border-white/10 pb-2.5">
           <span className="text-white/60">
             {t.locked.trackLabel} <strong className="text-white">{track.title}</strong>
@@ -58,7 +58,7 @@ export const LockedLevelCard: React.FC<LockedLevelCardProps> = ({
               key={req.id}
               type="button"
               onClick={() => onJumpToExercise(req)}
-              className="w-full min-h-[42px] px-3 py-2 rounded-none bg-neutral-950/75 hover:bg-neutral-900/90 backdrop-blur-md border border-white/15 hover:border-white/35 flex items-center justify-between gap-3 text-left transition-all"
+              className="w-full min-h-[42px] px-3 py-2 rounded-none bg-neutral-950 hover:bg-neutral-900 border border-white/15 hover:border-white/35 flex items-center justify-between gap-3 text-left transition-colors"
             >
               <div className="flex items-center gap-2 min-w-0">
                 <Circle className="w-3.5 h-3.5 text-white/40 shrink-0" />
@@ -78,7 +78,7 @@ export const LockedLevelCard: React.FC<LockedLevelCardProps> = ({
           <button
             type="button"
             onClick={() => onJumpToExercise(nextBasic)}
-            className="w-full sm:w-auto min-h-[44px] py-2.5 px-5 rounded-none bg-white hover:bg-neutral-200 text-black font-semibold text-xs inline-flex items-center justify-center gap-2 transition-all"
+            className="w-full sm:w-auto min-h-[44px] py-2.5 px-5 rounded-none bg-white hover:bg-neutral-200 text-black font-semibold text-xs inline-flex items-center justify-center gap-2 transition-colors"
           >
             <span>{t.locked.jumpToBasic}</span>
             <ArrowRight className="w-4 h-4" />
@@ -88,7 +88,7 @@ export const LockedLevelCard: React.FC<LockedLevelCardProps> = ({
         <button
           type="button"
           onClick={onBackToTracks}
-          className="w-full sm:w-auto min-h-[44px] py-2.5 px-5 rounded-none bg-black/70 hover:bg-neutral-900/80 backdrop-blur-md border border-white/15 text-white/85 font-medium text-xs inline-flex items-center justify-center gap-2 transition-all"
+          className="w-full sm:w-auto min-h-[44px] py-2.5 px-5 rounded-none bg-black hover:bg-neutral-900 border border-white/15 text-white/85 font-medium text-xs inline-flex items-center justify-center gap-2 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>{t.locked.backToTracks}</span>

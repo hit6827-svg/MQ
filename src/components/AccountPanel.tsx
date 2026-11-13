@@ -53,7 +53,7 @@ export const AccountPanel: React.FC<AccountPanelProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="min-h-[40px] px-3 py-1.5 rounded-none bg-neutral-950/75 hover:bg-neutral-900 backdrop-blur-md border border-white/15 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5 transition-colors shrink-0"
+          className="min-h-[40px] px-3 py-1.5 rounded-none bg-neutral-950 hover:bg-neutral-900 border border-white/15 text-xs font-medium text-white/80 hover:text-white flex items-center gap-1.5 transition-colors shrink-0"
           aria-label={t.nav.closePanel}
         >
           <X className="w-4 h-4" />
@@ -62,7 +62,7 @@ export const AccountPanel: React.FC<AccountPanelProps> = ({
       </div>
 
       {authError && (
-        <div className="p-3.5 rounded-none bg-red-950/50 backdrop-blur-md border border-red-500/40 flex items-start gap-2.5 text-xs text-red-200">
+        <div className="p-3.5 rounded-none bg-red-950/60 border border-red-500/40 flex items-start gap-2.5 text-xs text-red-200">
           <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
           <span className="flex-1 leading-relaxed">{authError}</span>
           <button
@@ -77,10 +77,10 @@ export const AccountPanel: React.FC<AccountPanelProps> = ({
       )}
 
       {/* Profile / Authentication Card */}
-      <section className="p-4 sm:p-6 rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15 space-y-5">
+      <section className="p-4 sm:p-6 rounded-none bg-neutral-950/90 border border-white/15 space-y-5">
         {user ? (
           <>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-none bg-black/65 backdrop-blur-md border border-white/15">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-none bg-black/80 border border-white/15">
               {user.photoURL ? (
                 <img
                   src={user.photoURL}
@@ -112,7 +112,7 @@ export const AccountPanel: React.FC<AccountPanelProps> = ({
               <button
                 type="button"
                 onClick={signOutUser}
-                className="min-h-[40px] px-4 py-2 rounded-none bg-neutral-900/80 hover:bg-neutral-800 backdrop-blur-md border border-white/15 text-xs font-semibold text-white flex items-center justify-center gap-2 transition-colors shrink-0"
+                className="min-h-[40px] px-4 py-2 rounded-none bg-neutral-900 hover:bg-neutral-800 border border-white/15 text-xs font-semibold text-white flex items-center justify-center gap-2 transition-colors shrink-0"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>{t.account.signOut}</span>
@@ -120,7 +120,7 @@ export const AccountPanel: React.FC<AccountPanelProps> = ({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3.5 rounded-none bg-black/65 backdrop-blur-md border border-white/15">
+              <div className="p-3.5 rounded-none bg-black/80 border border-white/15">
                 <span className="text-[11px] font-mono text-white/45 block">
                   {t.account.currentRank}
                 </span>
@@ -129,7 +129,7 @@ export const AccountPanel: React.FC<AccountPanelProps> = ({
                   {rankEval.currentRank.name}
                 </span>
               </div>
-              <div className="p-3.5 rounded-none bg-black/65 backdrop-blur-md border border-white/15">
+              <div className="p-3.5 rounded-none bg-black/80 border border-white/15">
                 <span className="text-[11px] font-mono text-white/45 block">
                   {t.account.proofsSolved}
                 </span>
@@ -144,7 +144,7 @@ export const AccountPanel: React.FC<AccountPanelProps> = ({
         ) : (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3.5 rounded-none bg-black/65 backdrop-blur-md border border-white/15">
+              <div className="p-3.5 rounded-none bg-black/80 border border-white/15">
                 <span className="text-[11px] font-mono text-white/45 block">
                   {t.account.currentRank}
                 </span>
@@ -153,7 +153,7 @@ export const AccountPanel: React.FC<AccountPanelProps> = ({
                   {rankEval.currentRank.name}
                 </span>
               </div>
-              <div className="p-3.5 rounded-none bg-black/65 backdrop-blur-md border border-white/15">
+              <div className="p-3.5 rounded-none bg-black/80 border border-white/15">
                 <span className="text-[11px] font-mono text-white/45 block">
                   {t.account.proofsSolved}
                 </span>
@@ -193,7 +193,7 @@ export const AccountPanel: React.FC<AccountPanelProps> = ({
       </section>
 
       {/* Preferences Card (NO Attempt Logs) */}
-      <section className="p-4 sm:p-6 rounded-none bg-neutral-950/70 backdrop-blur-xl border border-white/15 space-y-5">
+      <section className="p-4 sm:p-6 rounded-none bg-neutral-950/90 border border-white/15 space-y-5">
         <div className="flex items-center gap-2.5 pb-3 border-b border-white/10">
           <Sliders className="w-4 h-4 text-white/75" />
           <h2 className="text-sm sm:text-base font-bold text-white">
@@ -215,10 +215,10 @@ export const AccountPanel: React.FC<AccountPanelProps> = ({
             <button
               type="button"
               onClick={() => handleLanguageSelect('en')}
-              className={`min-h-[38px] px-4 py-1.5 rounded-none text-xs font-mono border transition-all ${
+              className={`min-h-[38px] px-4 py-1.5 rounded-none text-xs font-mono border transition-colors ${
                 language === 'en'
                   ? 'bg-white text-black border-white font-semibold'
-                  : 'bg-black/70 backdrop-blur-md text-white/70 border-white/15 hover:text-white'
+                  : 'bg-black text-white/70 border-white/15 hover:text-white'
               }`}
             >
               English
@@ -226,10 +226,10 @@ export const AccountPanel: React.FC<AccountPanelProps> = ({
             <button
               type="button"
               onClick={() => handleLanguageSelect('fr')}
-              className={`min-h-[38px] px-4 py-1.5 rounded-none text-xs font-mono border transition-all ${
+              className={`min-h-[38px] px-4 py-1.5 rounded-none text-xs font-mono border transition-colors ${
                 language === 'fr'
                   ? 'bg-white text-black border-white font-semibold'
-                  : 'bg-black/70 backdrop-blur-md text-white/70 border-white/15 hover:text-white'
+                  : 'bg-black text-white/70 border-white/15 hover:text-white'
               }`}
             >
               Français
@@ -255,10 +255,10 @@ export const AccountPanel: React.FC<AccountPanelProps> = ({
                   key={mins}
                   type="button"
                   onClick={() => onChangeDefaultTimer(mins)}
-                  className={`min-h-[36px] px-3 py-1 rounded-none text-xs font-mono border transition-all ${
+                  className={`min-h-[36px] px-3 py-1 rounded-none text-xs font-mono border transition-colors ${
                     isSelected
                       ? 'bg-white text-black border-white font-semibold'
-                      : 'bg-black/70 backdrop-blur-md text-white/70 border-white/15 hover:text-white'
+                      : 'bg-black text-white/70 border-white/15 hover:text-white'
                   }`}
                 >
                   {mins === 0 ? t.account.untimedOption : `${mins} ${t.timer.minUnit}`}
