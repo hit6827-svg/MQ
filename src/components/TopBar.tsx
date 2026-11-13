@@ -26,7 +26,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   const firstName = user?.displayName?.split(' ')[0] || '';
 
   return (
-    <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-md transform-gpu border-b border-white/15 px-3 sm:px-6 py-2.5 sm:py-3">
+    <header className="sticky top-0 z-50 bg-black/90 backdrop-blur-sm will-change-transform border-b border-white/15 px-3 sm:px-6 py-2.5 sm:py-3">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
         {/* Non-interactive Brand Identity & Rank Indicator */}
         <div className="flex items-center justify-between sm:justify-start gap-3">

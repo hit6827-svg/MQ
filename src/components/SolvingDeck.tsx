@@ -44,6 +44,160 @@ function formatClock(totalSeconds: number): string {
   return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
+interface ProblemTimerBarProps {
+  exerciseId: string;
+  configuredMinutes: number;
+  onChangeMinutes: (minutes: number) => void;
+  stopSignal: boolean;
+}
+
+const ProblemTimerBar: React.FC<ProblemTimerBarProps> = React.memo(
+  ({ exerciseId, configuredMinutes, onChangeMinutes, stopSignal }) => {
+    const { t } = useLanguage();
+    const [secondsValue, setSecondsValue] = useState<number>(
+      configuredMinutes > 0 ? configuredMinutes * 60 : 0
+    );
+    const [isRunning, setIsRunning] = useState(false);
+
+    useEffect(() => {
+      setIsRunning(false);
+      setSecondsValue(configuredMinutes > 0 ? configuredMinutes * 60 : 0);
+    }, [exerciseId, configuredMinutes]);
+
+    useEffect(() => {
+      if (stopSignal) {
+        setIsRunning(false);
+      }
+    }, [stopSignal]);
+
+    useEffect(() => {
+      if (!isRunning) return;
+      const interval = setInterval(() => {
+        setSecondsValue((prev) => {
+          if (configuredMinutes === 0) {
+            return prev + 1;
+          }
+          if (prev <= 1) {
+            setIsRunning(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }, [isRunning, configuredMinutes]);
+
+    const handleApplyMinutes = (mins: number) => {
+      const clamped = Math.min(180, Math.max(0, mins));
+      setIsRunning(false);
+      onChangeMinutes(clamped);
+      setSecondsValue(clamped > 0 ? clamped * 60 : 0);
+    };
+
+    const handleResetTimer = () => {
+      setIsRunning(false);
+      setSecondsValue(configuredMinutes > 0 ? configuredMinutes * 60 : 0);
+    };
+
+    const isTimeUp = configuredMinutes > 0 && secondsValue === 0 && !isRunning;
+
+    return (
+      <>
+        <div className="p-3.5 sm:p-5 rounded-none bg-neutral-950/90 border border-white/15 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex items-center justify-between lg:justify-start gap-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-none bg-black border border-white/15 flex items-center justify-center shrink-0">
+                <Clock className="w-4 h-4 text-white/80" />
+              </div>
+              <div>
+                <div className="text-[11px] font-mono uppercase tracking-wider text-white/50">
+                  {t.timer.title}
+                </div>
+                <div
+                  className={`text-xl sm:text-2xl font-mono font-bold tabular-nums leading-tight ${
+                    isTimeUp ? 'text-amber-400' : 'text-white'
+                  }`}
+                >
+                  {formatClock(secondsValue)}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setIsRunning((r) => !r)}
+                className="min-h-[38px] px-3 py-1.5 rounded-none bg-white hover:bg-neutral-200 text-black font-semibold text-xs flex items-center gap-1.5 transition-colors"
+              >
+                {isRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                <span>{isRunning ? t.timer.pause : t.timer.start}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleResetTimer}
+                className="min-h-[38px] px-2.5 py-1.5 rounded-none bg-black hover:bg-neutral-900 border border-white/15 text-white/80 text-xs flex items-center gap-1 transition-colors"
+                title={t.timer.reset}
+                aria-label={t.timer.reset}
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{t.timer.reset}</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] font-mono text-white/45 mr-1 hidden sm:inline">
+              {t.timer.chooseDuration}
+            </span>
+            {TIMER_PRESETS.map((mins) => {
+              const active = configuredMinutes === mins;
+              return (
+                <button
+                  key={mins}
+                  type="button"
+                  onClick={() => handleApplyMinutes(mins)}
+                  className={`min-h-[34px] px-2.5 py-1 rounded-none text-[11px] font-mono border transition-colors ${
+                    active
+                      ? 'bg-white text-black border-white font-semibold'
+                      : 'bg-black text-white/70 border-white/15 hover:text-white hover:border-white/35'
+                  }`}
+                >
+                  {mins === 0 ? t.timer.untimed : `${mins}${t.timer.minUnit[0]}`}
+                </button>
+              );
+            })}
+            <div className="flex items-center gap-1 ml-0.5 pl-1.5 border-l border-white/10">
+              <button
+                type="button"
+                onClick={() => handleApplyMinutes(Math.max(0, configuredMinutes - 1))}
+                disabled={configuredMinutes <= 0}
+                className="min-h-[34px] min-w-[34px] rounded-none bg-black border border-white/15 text-white/75 hover:text-white disabled:opacity-30 flex items-center justify-center transition-colors"
+                aria-label="-1 minute"
+              >
+                <Minus className="w-3 h-3" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleApplyMinutes(Math.min(180, configuredMinutes + 1))}
+                className="min-h-[34px] min-w-[34px] rounded-none bg-black border border-white/15 text-white/75 hover:text-white flex items-center justify-center transition-colors"
+                aria-label="+1 minute"
+              >
+                <Plus className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {isTimeUp && (
+          <div className="px-4 py-2.5 rounded-none bg-amber-950/60 border border-amber-500/35 text-xs text-amber-200 font-medium text-center">
+            {t.timer.timeUp}
+          </div>
+        )}
+      </>
+    );
+  }
+);
+
 export const SolvingDeck: React.FC<SolvingDeckProps> = ({
   exercise,
   isSolved,
@@ -65,12 +219,6 @@ export const SolvingDeck: React.FC<SolvingDeckProps> = ({
   const [stepIndex, setStepIndex] = useState(0);
   const [viewAllSteps, setViewAllSteps] = useState(false);
 
-  // Per-problem user-chosen countdown (or stopwatch if configuredMinutes === 0)
-  const [secondsValue, setSecondsValue] = useState<number>(
-    configuredMinutes > 0 ? configuredMinutes * 60 : 0
-  );
-  const [isRunning, setIsRunning] = useState(false);
-
   // Reset states when exercise changes
   useEffect(() => {
     setIsSolutionRevealed(false);
@@ -78,42 +226,9 @@ export const SolvingDeck: React.FC<SolvingDeckProps> = ({
     setShowSequences(false);
     setStepIndex(0);
     setViewAllSteps(false);
-    setIsRunning(false);
-    setSecondsValue(configuredMinutes > 0 ? configuredMinutes * 60 : 0);
-  }, [exercise.id, configuredMinutes]);
-
-  // Tick timer
-  useEffect(() => {
-    if (!isRunning) return;
-    const interval = setInterval(() => {
-      setSecondsValue((prev) => {
-        if (configuredMinutes === 0) {
-          return prev + 1;
-        }
-        if (prev <= 1) {
-          setIsRunning(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [isRunning, configuredMinutes]);
-
-  const handleApplyMinutes = (mins: number) => {
-    const clamped = Math.min(180, Math.max(0, mins));
-    setIsRunning(false);
-    onChangeMinutes(clamped);
-    setSecondsValue(clamped > 0 ? clamped * 60 : 0);
-  };
-
-  const handleResetTimer = () => {
-    setIsRunning(false);
-    setSecondsValue(configuredMinutes > 0 ? configuredMinutes * 60 : 0);
-  };
+  }, [exercise.id]);
 
   const handleSuccessClick = () => {
-    setIsRunning(false);
     setOutcome('success');
     confetti({
       particleCount: 50,
@@ -125,7 +240,6 @@ export const SolvingDeck: React.FC<SolvingDeckProps> = ({
   };
 
   const handleReviewClick = () => {
-    setIsRunning(false);
     setOutcome('review');
     setShowSequences(true);
     setStepIndex(0);
@@ -134,102 +248,15 @@ export const SolvingDeck: React.FC<SolvingDeckProps> = ({
 
   const steps = exercise.solvingSequences;
   const activeStep = steps[stepIndex] || steps[0];
-  const isTimeUp = configuredMinutes > 0 && secondsValue === 0 && !isRunning;
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* User-Chosen Problem Timer Bar */}
-      <div className="p-3.5 sm:p-5 rounded-none bg-neutral-950/90 border border-white/15 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div className="flex items-center justify-between lg:justify-start gap-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-none bg-black border border-white/15 flex items-center justify-center shrink-0">
-              <Clock className="w-4 h-4 text-white/80" />
-            </div>
-            <div>
-              <div className="text-[11px] font-mono uppercase tracking-wider text-white/50">
-                {t.timer.title}
-              </div>
-              <div
-                className={`text-xl sm:text-2xl font-mono font-bold tabular-nums leading-tight ${
-                  isTimeUp ? 'text-amber-400' : 'text-white'
-                }`}
-              >
-                {formatClock(secondsValue)}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setIsRunning((r) => !r)}
-              className="min-h-[38px] px-3 py-1.5 rounded-none bg-white hover:bg-neutral-200 text-black font-semibold text-xs flex items-center gap-1.5 transition-colors"
-            >
-              {isRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              <span>{isRunning ? t.timer.pause : t.timer.start}</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleResetTimer}
-              className="min-h-[38px] px-2.5 py-1.5 rounded-none bg-black hover:bg-neutral-900 border border-white/15 text-white/80 text-xs flex items-center gap-1 transition-colors"
-              title={t.timer.reset}
-              aria-label={t.timer.reset}
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{t.timer.reset}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Custom Duration Selector */}
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[11px] font-mono text-white/45 mr-1 hidden sm:inline">
-            {t.timer.chooseDuration}
-          </span>
-          {TIMER_PRESETS.map((mins) => {
-            const active = configuredMinutes === mins;
-            return (
-              <button
-                key={mins}
-                type="button"
-                onClick={() => handleApplyMinutes(mins)}
-                className={`min-h-[34px] px-2.5 py-1 rounded-none text-[11px] font-mono border transition-colors ${
-                  active
-                    ? 'bg-white text-black border-white font-semibold'
-                    : 'bg-black text-white/70 border-white/15 hover:text-white hover:border-white/35'
-                }`}
-              >
-                {mins === 0 ? t.timer.untimed : `${mins}${t.timer.minUnit[0]}`}
-              </button>
-            );
-          })}
-          <div className="flex items-center gap-1 ml-0.5 pl-1.5 border-l border-white/10">
-            <button
-              type="button"
-              onClick={() => handleApplyMinutes(Math.max(0, configuredMinutes - 1))}
-              disabled={configuredMinutes <= 0}
-              className="min-h-[34px] min-w-[34px] rounded-none bg-black border border-white/15 text-white/75 hover:text-white disabled:opacity-30 flex items-center justify-center transition-colors"
-              aria-label="-1 minute"
-            >
-              <Minus className="w-3 h-3" />
-            </button>
-            <button
-              type="button"
-              onClick={() => handleApplyMinutes(Math.min(180, configuredMinutes + 1))}
-              className="min-h-[34px] min-w-[34px] rounded-none bg-black border border-white/15 text-white/75 hover:text-white flex items-center justify-center transition-colors"
-              aria-label="+1 minute"
-            >
-              <Plus className="w-3 h-3" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {isTimeUp && (
-        <div className="px-4 py-2.5 rounded-none bg-amber-950/60 border border-amber-500/35 text-xs text-amber-200 font-medium text-center">
-          {t.timer.timeUp}
-        </div>
-      )}
+      <ProblemTimerBar
+        exerciseId={exercise.id}
+        configuredMinutes={configuredMinutes}
+        onChangeMinutes={onChangeMinutes}
+        stopSignal={outcome !== 'idle'}
+      />
 
       {/* Exercise Main Card */}
       <div className="p-4 sm:p-6 lg:p-8 rounded-none bg-neutral-950/90 border border-white/15 relative overflow-hidden">

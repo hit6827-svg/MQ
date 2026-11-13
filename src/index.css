@@ -9,17 +9,12 @@
     color: #ffffff;
     overflow-x: clip;
     -webkit-tap-highlight-color: transparent;
-  }
-
-  /* Cancel visible scrollbars globally so UI navigation is button-driven */
-  *,
-  *::before,
-  *::after {
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
 
-  *::-webkit-scrollbar {
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
     display: none;
     width: 0;
     height: 0;
@@ -66,3 +61,6 @@
   height: 0;
 }
 
+.perf-card {
+  contain: layout style;
+}

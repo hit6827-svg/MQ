@@ -256,12 +256,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-black text-white relative flex flex-col font-sans selection:bg-neutral-800">
-      {/* Subtle static dark ambient depth (zero particles) */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.06),transparent_55%),radial-gradient(ellipse_at_bottom_left,rgba(255,255,255,0.03),transparent_55%)]"
-      />
-
       {/* Persistent Navigation Bar — Always visible on every screen and state with strictly 3 items */}
       <TopBar
         activeSection={activeNavPanel}

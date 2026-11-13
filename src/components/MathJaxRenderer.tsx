@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { memo, useEffect, useRef } from 'react';
 
 interface MathJaxRendererProps {
   math: string;
@@ -44,7 +44,7 @@ function prepareMathString(raw: string, inline: boolean, autoWrap: boolean): str
   return `$$${trimmed}$$`;
 }
 
-export const MathJaxRenderer: React.FC<MathJaxRendererProps> = ({
+const MathJaxRendererBase: React.FC<MathJaxRendererProps> = ({
   math,
   className = '',
   inline = false,
@@ -54,6 +54,7 @@ export const MathJaxRenderer: React.FC<MathJaxRendererProps> = ({
 
   useEffect(() => {
     let isCancelled = false;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
     const container = containerRef.current;
     if (!container) return;
 
@@ -66,7 +67,6 @@ export const MathJaxRenderer: React.FC<MathJaxRendererProps> = ({
       if (isCancelled || !container) return;
 
       if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
-        // Clear previous typeset cache for this element if available
         if (typeof window.MathJax.typesetClear === 'function') {
           window.MathJax.typesetClear([container]);
         }
@@ -77,9 +77,7 @@ export const MathJaxRenderer: React.FC<MathJaxRendererProps> = ({
           }
         });
       } else {
-        // Retry shortly if MathJax script is still loading
-        const timer = setTimeout(renderMath, 100);
-        return () => clearTimeout(timer);
+        retryTimer = setTimeout(renderMath, 100);
       }
     };
 
@@ -87,6 +85,7 @@ export const MathJaxRenderer: React.FC<MathJaxRendererProps> = ({
 
     return () => {
       isCancelled = true;
+      if (retryTimer) clearTimeout(retryTimer);
     };
   }, [math, inline, autoWrap]);
 
@@ -106,3 +105,5 @@ export const MathJaxRenderer: React.FC<MathJaxRendererProps> = ({
     />
   );
 };
+
+export const MathJaxRenderer = memo(MathJaxRendererBase);
