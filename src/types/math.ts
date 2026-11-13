@@ -1,15 +1,15 @@
-export type TopicSlug = 'calculus' | 'linear_algebra' | 'number_theory' | 'discrete_math';
+export type TrackSlug = 'numbers_structures' | 'analysis_vectors';
 
-export interface Topic {
+export type LevelSlug = 'basic' | 'advanced';
+
+export interface Track {
   id: string;
-  slug: TopicSlug;
+  slug: TrackSlug;
   title: string;
+  subtitle: string;
   description: string;
   orderIndex: number;
-  iconName: string;
 }
-
-export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced' | 'Olympiad';
 
 export interface SolvingStep {
   stepNumber: number;
@@ -21,34 +21,43 @@ export interface SolvingStep {
 
 export interface Exercise {
   id: string;
-  topicId: TopicSlug;
+  trackId: TrackSlug;
+  level: LevelSlug;
+  orderInLevel: number;
   title: string;
-  difficulty: Difficulty;
+  topicTag: string;
   latexStatement: string;
   theoremContext?: string;
   targetSolution: string;
-  hints: string[];
   solvingSequences: SolvingStep[];
-  pointsValue: number;
-  unlockHourOffset?: number;
+  defaultMinutes: number;
 }
 
-export interface HistoryLog {
-  id: string;
-  exerciseId: string;
-  exerciseTitle: string;
-  topicId: TopicSlug;
-  outcome: 'success' | 'failed';
-  pointsEarned: number;
-  timeSpentSeconds: number;
-  timestamp: string;
+export interface RankTier {
+  rankNumber: 1 | 2 | 3 | 4 | 5;
+  id: 'master' | 'fellow' | 'scholar' | 'apprentice' | 'initiate';
+  name: string;
+  criteria: string;
+  shortRequirement: string;
+}
+
+export interface TrackProgress {
+  trackSlug: TrackSlug;
+  basicExercises: Exercise[];
+  advancedExercises: Exercise[];
+  basicSolvedCount: number;
+  basicTotalCount: number;
+  advancedSolvedCount: number;
+  advancedTotalCount: number;
+  isAdvancedUnlocked: boolean;
+  missingBasicExercises: Exercise[];
 }
 
 export interface UserStats {
-  succeededCount: number;
-  failedCount: number;
-  totalAttempts: number;
-  successPercentage: number;
-  failurePercentage: number;
-  totalPoints: number;
+  solvedCount: number;
+  totalProblems: number;
+  verifiedCount: number;
+  struggledCount: number;
+  totalTrials: number;
+  accuracyPercentage: number;
 }

@@ -1,567 +1,547 @@
-import { Topic, Exercise, TopicSlug } from '../types/math.ts';
-import { TOPICS, CURATED_EXERCISES } from './curatedExercises.ts';
+import { Track, Exercise, TrackSlug } from '../types/math.ts';
+import { TRACKS, CURATED_EXERCISES } from './curatedExercises.ts';
 import { Language } from '../i18n/translations.ts';
 
-const TOPIC_FR_MAP: Record<TopicSlug, { title: string; description: string }> = {
-  calculus: {
-    title: 'Analyse & Calcul infinitésimal',
+const TRACK_FR_MAP: Record<
+  TrackSlug,
+  { title: string; subtitle: string; description: string }
+> = {
+  numbers_structures: {
+    title: 'Nombres et Structures',
+    subtitle: 'Récurrence, sous-espaces linéaires, valeurs propres & algèbres modulaires',
     description:
-      'Intégrales définies, réductions à plusieurs variables, séries infinies et développements asymptotiques.',
+      'Construisez la maîtrise déductive des identités discrètes, des espaces vectoriels, des congruences modulaires et des décompositions matricielles.',
   },
-  linear_algebra: {
-    title: 'Algèbre linéaire',
+  analysis_vectors: {
+    title: 'Analyse et Vecteurs',
+    subtitle: 'Continuité, intégration, géométrie euclidienne & séries convergentes',
     description:
-      'Sous-espaces propres, transformations matricielles, projections orthogonales et décompositions spectrales.',
-  },
-  number_theory: {
-    title: 'Théorie des nombres',
-    description:
-      'Congruences modulaires, équations diophantiennes, indicatrice d’Euler et arithmétique des nombres premiers.',
-  },
-  discrete_math: {
-    title: 'Mathématiques discrètes & Combinatoire',
-    description:
-      'Dérangements, relations de récurrence, fonctions génératrices et invariants combinatoires.',
+      'Démontrez des inégalités analytiques, des intégrales exactes, des projections orthogonales et des extrema sous contrainte.',
   },
 };
 
 type ExerciseTranslation = Pick<
   Exercise,
-  'title' | 'latexStatement' | 'theoremContext' | 'solvingSequences'
+  'title' | 'topicTag' | 'latexStatement' | 'theoremContext' | 'solvingSequences'
 >;
 
 const EXERCISE_FR_MAP: Record<string, ExerciseTranslation> = {
-  calc_gaussian_integral: {
-    title: 'L’intégrale gaussienne classique',
-    latexStatement: `Évaluer l’intégrale impropre sur la droite réelle :
-$$I = \\int_{-\\infty}^{\\infty} e^{-x^2} \\, dx$$`,
-    theoremContext: 'Théorème de Fubini-Tonelli & passage en coordonnées polaires',
+  ns_basic_induction_squares: {
+    title: 'Somme des carrés par récurrence',
+    topicTag: 'Preuve discrète · Récurrence',
+    latexStatement: `Démontrer par récurrence que pour tout entier $n \\ge 1$ :
+$$\\sum_{k=1}^{n} k^2 = 1^2 + 2^2 + \\cdots + n^2 = \\frac{n(n+1)(2n+1)}{6}$$`,
+    theoremContext: 'Principe de récurrence mathématique',
     solvingSequences: [
       {
         stepNumber: 1,
-        title: 'Former le carré via une intégrale double',
-        latexContent: `$$I^2 = \\left( \\int_{-\\infty}^{\\infty} e^{-x^2} dx \\right) \\left( \\int_{-\\infty}^{\\infty} e^{-y^2} dy \\right) = \\int_{-\\infty}^{\\infty} \\int_{-\\infty}^{\\infty} e^{-(x^2 + y^2)} \\, dx \\, dy$$`,
-        explanation:
-          'Comme $x$ et $y$ sont des variables muettes indépendantes, le produit des deux intégrales simples sur $\\mathbb{R}$ égale l’intégrale double sur le plan $\\mathbb{R}^2$.',
-        keyRule: 'Théorème de Fubini-Tonelli pour les fonctions positives',
+        title: 'Vérifier l’initialisation (n = 1)',
+        latexContent: `$$\\text{Membre gauche} = \\sum_{k=1}^{1} k^2 = 1^2 = 1, \\qquad \\text{Membre droit} = \\frac{1(1+1)(2(1)+1)}{6} = 1$$`,
+        explanation: 'Les deux membres valent $1$ pour $n = 1$, ce qui établit $P(1)$.',
+        keyRule: 'Initialisation $P(1)$',
       },
       {
         stepNumber: 2,
-        title: 'Changement de variables en coordonnées polaires',
-        latexContent: `$$\\begin{cases} x = r\\cos\\theta \\\\ y = r\\sin\\theta \\end{cases} \\implies x^2 + y^2 = r^2, \\quad dx\\,dy = r\\,dr\\,d\\theta$$
-$$I^2 = \\int_{0}^{2\\pi} d\\theta \\int_{0}^{\\infty} r e^{-r^2} \\, dr$$`,
+        title: 'Poser l’hypothèse de récurrence',
+        latexContent: `$$\\text{Supposons pour un entier } m \\ge 1 \\text{ fixé que } \\sum_{k=1}^{m} k^2 = \\frac{m(m+1)(2m+1)}{6}$$`,
         explanation:
-          'Le plan entier est parcouru par $\\theta \\in [0, 2\\pi]$ et $r \\in [0, \\infty)$. Le déterminant jacobien introduit le facteur $r$.',
-        keyRule: 'Jacobien polaire : $J(r,\\theta) = r$',
+          'On suppose $P(m)$ vraie afin de démontrer que $P(m+1)$ en découle.',
+        keyRule: 'Hypothèse de récurrence $P(m)$',
       },
       {
         stepNumber: 3,
-        title: 'Calculer l’intégrale radiale par substitution',
-        latexContent: `$$\\int_{0}^{2\\pi} d\\theta = 2\\pi$$
-$$\\text{Posons } u = r^2 \\implies du = 2r\\,dr \\implies r\\,dr = \\frac{du}{2}$$
-$$\\int_{0}^{\\infty} r e^{-r^2} dr = \\frac{1}{2} \\int_{0}^{\\infty} e^{-u} du = \\frac{1}{2} \\left[-e^{-u}\\right]_0^\\infty = \\frac{1}{2}(0 - (-1)) = \\frac{1}{2}$$`,
+        title: 'Développer la somme au rang m + 1',
+        latexContent: `$$\\sum_{k=1}^{m+1} k^2 = \\frac{m(m+1)(2m+1)}{6} + (m+1)^2 = \\frac{(m+1)(2m^2 + 7m + 6)}{6}$$`,
         explanation:
-          'La présence du facteur $r$ rend le calcul de la primitive immédiat.',
-        keyRule: 'Primitive exponentielle usuelle',
+          'En mettant $(m+1)/6$ en facteur, on obtient le trinôme $2m^2 + 7m + 6$.',
+        keyRule: 'Factorisation algébrique',
       },
       {
         stepNumber: 4,
-        title: 'Combiner les facteurs et extraire la racine positive',
-        latexContent: `$$I^2 = 2\\pi \\cdot \\frac{1}{2} = \\pi \\implies I = \\sqrt{\\pi}$$`,
+        title: 'Factoriser et conclure P(m + 1)',
+        latexContent: `$$2m^2 + 7m + 6 = (m+2)(2m+3) \\implies \\sum_{k=1}^{m+1} k^2 = \\frac{(m+1)(m+2)(2m+3)}{6} \\quad \\blacksquare$$`,
         explanation:
-          'Comme l’intégrande $e^{-x^2} > 0$ pour tout $x \\in \\mathbb{R}$, on a $I > 0$, d’où $I = \\sqrt{\\pi}$.',
-        keyRule: 'Positivité de l’intégrale',
+          'La formule obtenue correspond exactement à l’énoncé au rang $m+1$. Par récurrence, l’identité est vraie pour tout $n \\ge 1$.',
+        keyRule: 'Hérédité et conclusion',
       },
     ],
   },
 
-  calc_basel_problem: {
-    title: 'Le problème de Bâle (somme des inverses des carrés)',
-    latexStatement: `Déterminer la valeur exacte de la série infinie :
-$$S = \\sum_{n=1}^{\\infty} \\frac{1}{n^2} = 1 + \\frac{1}{4} + \\frac{1}{9} + \\frac{1}{16} + \\cdots$$`,
-    theoremContext: 'Factorisation en produit infini d’Euler & série de Taylor',
+  ns_basic_kernel_subspace: {
+    title: 'Sous-espace noyau & base du noyau matriciel',
+    topicTag: 'Algèbre linéaire · Sous-espaces',
+    latexStatement: `Soit $T : V \\to W$ une application linéaire entre espaces vectoriels réels.
+(a) Démontrer rigoureusement que $\\ker(T) = \\{\\mathbf{v} \\in V : T(\\mathbf{v}) = \\mathbf{0}_W\\}$ est un sous-espace vectoriel de $V$.
+(b) Déterminer une base de $\\ker(A)$ pour $A = \\begin{pmatrix} 1 & -2 & 3 \\\\ 2 & -4 & 6 \\end{pmatrix}$.`,
+    theoremContext: 'Caractérisation des sous-espaces & linéarité',
     solvingSequences: [
       {
         stepNumber: 1,
-        title: 'Développement en série entière du sinus cardinal',
-        latexContent: `$$\\sin x = x - \\frac{x^3}{3!} + \\frac{x^5}{5!} - \\cdots \\implies \\frac{\\sin x}{x} = 1 - \\frac{x^2}{6} + \\frac{x^4}{120} - \\cdots$$`,
+        title: 'Prouver que le vecteur nul appartient au noyau',
+        latexContent: `$$T(\\mathbf{0}_V) = T(0 \\cdot \\mathbf{0}_V) = 0 \\cdot T(\\mathbf{0}_V) = \\mathbf{0}_W \\implies \\mathbf{0}_V \\in \\ker(T)$$`,
         explanation:
-          'En divisant le développement de Maclaurin de $\\sin x$ par $x$, on obtient un coefficient quadratique égal à $-\\frac{1}{6}$.',
-        keyRule: 'Développement de Maclaurin',
+          'Toute application linéaire envoie le vecteur nul sur le vecteur nul ; $\\ker(T)$ est donc non vide.',
+        keyRule: 'Axiome 1 : appartenance de $\\mathbf{0}_V$',
       },
       {
         stepNumber: 2,
-        title: 'Factorisation d’Euler par les racines',
-        latexContent: `$$\\frac{\\sin x}{x} = \\prod_{n=1}^{\\infty} \\left( 1 - \\frac{x^2}{n^2 \\pi^2} \\right) = \\left(1 - \\frac{x^2}{\\pi^2}\\right)\\left(1 - \\frac{x^2}{4\\pi^2}\\right)\\left(1 - \\frac{x^2}{9\\pi^2}\\right)\\cdots$$`,
+        title: 'Prouver la stabilité par combinaisons linéaires',
+        latexContent: `$$\\forall \\mathbf{u}, \\mathbf{v} \\in \\ker(T), \\; c \\in \\mathbb{R} : \\quad T(\\mathbf{u} + \\mathbf{v}) = \\mathbf{0}_W, \\quad T(c\\mathbf{u}) = c\\mathbf{0}_W = \\mathbf{0}_W$$`,
         explanation:
-          'Les zéros de $\\frac{\\sin x}{x}$ sont exactement $x = \\pm n\\pi$. Le regroupement des facteurs conjugués donne $\\prod (1 - x^2/(n^2\\pi^2))$.',
-        keyRule: 'Produit infini de Weierstrass-Euler',
+          'Par linéarité de $T$, $\\ker(T)$ est stable par addition et par multiplication scalaire.',
+        keyRule: 'Stabilité linéaire',
       },
       {
         stepNumber: 3,
-        title: 'Identifier les coefficients en x²',
-        latexContent: `$$\\text{Coefficient de } x^2 \\text{ dans le produit} = -\\sum_{n=1}^{\\infty} \\frac{1}{n^2\\pi^2} = -\\frac{1}{\\pi^2} \\sum_{n=1}^{\\infty} \\frac{1}{n^2}$$
-$$\\text{Identification avec Taylor} : -\\frac{1}{6} = -\\frac{1}{\\pi^2} \\sum_{n=1}^{\\infty} \\frac{1}{n^2}$$`,
+        title: 'Échelonner la matrice A',
+        latexContent: `$$\\begin{pmatrix} 1 & -2 & 3 \\\\ 2 & -4 & 6 \\end{pmatrix} \\xrightarrow{R_2 \\leftarrow R_2 - 2R_1} \\begin{pmatrix} 1 & -2 & 3 \\\\ 0 & 0 & 0 \\end{pmatrix} \\implies x_1 = 2x_2 - 3x_3$$`,
         explanation:
-          'Le terme en $x^2$ provient du choix d’un seul facteur $-x^2/(n^2\\pi^2)$ multiplié par $1$ sur tous les autres termes.',
-        keyRule: 'Relations coefficients-racines généralisées',
+          'Le rang vaut $1$ ; il y a une variable principale $x_1$ et deux variables libres $x_2, x_3$.',
+        keyRule: 'Pivot de Gauss',
       },
       {
         stepNumber: 4,
-        title: 'Conclure pour la somme infinie',
-        latexContent: `$$\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}$$`,
+        title: 'Extraire une base libre et génératrice',
+        latexContent: `$$\\begin{pmatrix} x_1 \\\\ x_2 \\\\ x_3 \\end{pmatrix} = x_2 \\begin{pmatrix} 2 \\\\ 1 \\\\ 0 \\end{pmatrix} + x_3 \\begin{pmatrix} -3 \\\\ 0 \\\\ 1 \\end{pmatrix} \\implies \\mathcal{B}_{\\ker(A)} = \\left\\{\\begin{pmatrix}2\\\\1\\\\0\\end{pmatrix}, \\begin{pmatrix}-3\\\\0\\\\1\\end{pmatrix}\\right\\}$$`,
         explanation:
-          'En multipliant les deux membres par $-\\pi^2$, on obtient le célèbre résultat d’Euler $\\zeta(2) = \\frac{\\pi^2}{6}$.',
-        keyRule: 'Valeur exacte de $\\zeta(2)$',
+          'Les deux vecteurs sont linéairement indépendants et engendrent $\\ker(A)$, en accord avec le théorème du rang ($\\dim\\ker A = 3 - 1 = 2$).',
+        keyRule: 'Théorème du rang',
       },
     ],
   },
 
-  linalg_eigen_decomposition: {
-    title: 'Sous-espaces propres d’une matrice symétrique',
-    latexStatement: `Soit la matrice $A$ définie par :
-$$A = \\begin{pmatrix} 4 & 2 \\\\ 2 & 1 \\end{pmatrix}$$
-Déterminer les valeurs propres $\\lambda_1, \\lambda_2$ (avec $\\lambda_1 \\ge \\lambda_2$) ainsi que le vecteur propre normé associé à la valeur propre dominante $\\lambda_1$.`,
-    theoremContext: 'Théorème spectral pour les matrices symétriques réelles',
+  ns_basic_symmetric_eigen: {
+    title: 'Orthogonalité spectrale d’une matrice symétrique',
+    topicTag: 'Algèbre linéaire · Valeurs propres',
+    latexStatement: `Soit la matrice symétrique réelle $A = \\begin{pmatrix} 4 & 2 \\\\ 2 & 1 \\end{pmatrix}$.
+Déterminer les valeurs propres $\\lambda_1 > \\lambda_2$, calculer les vecteurs propres unitaires associés $\\mathbf{v}_1, \\mathbf{v}_2$ et vérifier explicitement que $\\langle \\mathbf{v}_1, \\mathbf{v}_2 \\rangle = 0$.`,
+    theoremContext: 'Théorème spectral réel ($A = A^T$)',
     solvingSequences: [
       {
         stepNumber: 1,
-        title: 'Écrire le polynôme caractéristique',
-        latexContent: `$$\\det(A - \\lambda I) = \\det\\begin{pmatrix} 4 - \\lambda & 2 \\\\ 2 & 1 - \\lambda \\end{pmatrix} = 0$$
-$$(4 - \\lambda)(1 - \\lambda) - (2)(2) = \\lambda^2 - 5\\lambda + 4 - 4 = \\lambda^2 - 5\\lambda = 0$$`,
+        title: 'Résoudre le polynôme caractéristique',
+        latexContent: `$$\\det(A - \\lambda I) = (4 - \\lambda)(1 - \\lambda) - 4 = \\lambda(\\lambda - 5) = 0 \\implies \\lambda_1 = 5, \\; \\lambda_2 = 0$$`,
         explanation:
-          'Les valeurs propres sont les racines du polynôme caractéristique obtenu via $\\det(A - \\lambda I) = 0$.',
-        keyRule: 'Équation caractéristique : $\\det(A - \\lambda I) = 0$',
+          'La trace vaut $5$ et le déterminant $0$, confirmant les racines $\\lambda_1 = 5$ et $\\lambda_2 = 0$.',
+        keyRule: 'Polynôme caractéristique',
       },
       {
         stepNumber: 2,
-        title: 'Factoriser pour trouver les valeurs propres',
-        latexContent: `$$\\lambda(\\lambda - 5) = 0 \\implies \\lambda_1 = 5, \\quad \\lambda_2 = 0$$`,
+        title: 'Déterminer le vecteur propre unitaire pour λ₁ = 5',
+        latexContent: `$$(A - 5I)\\mathbf{x} = \\mathbf{0} \\implies x = 2y \\implies \\mathbf{v}_1 = \\frac{1}{\\sqrt{5}}\\begin{pmatrix} 2 \\\\ 1 \\end{pmatrix}$$`,
         explanation:
-          'La matrice est singulière ($\\det(A) = 0$), donc $0$ est valeur propre ; la trace $\\text{tr}(A) = 5$ confirme $\\lambda_1 + \\lambda_2 = 5$.',
-        keyRule: 'Invariants trace et déterminant',
+          'Le sous-espace propre est engendré par $(2,1)^T$, que l’on divise par sa norme $\\sqrt{5}$.',
+        keyRule: 'Normalisation de $\\ker(A - 5I)$',
       },
       {
         stepNumber: 3,
-        title: 'Déterminer le vecteur propre associé à λ₁ = 5',
-        latexContent: `$$\\text{Pour } \\lambda_1 = 5 : \\quad (A - 5I)\\mathbf{v} = \\begin{pmatrix} -1 & 2 \\\\ 2 & -4 \\end{pmatrix} \\begin{pmatrix} x \\\\ y \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 0 \\end{pmatrix}$$
-$$-x + 2y = 0 \\implies x = 2y$$`,
+        title: 'Déterminer le vecteur propre unitaire pour λ₂ = 0',
+        latexContent: `$$A\\mathbf{x} = \\mathbf{0} \\implies 2x + y = 0 \\implies \\mathbf{v}_2 = \\frac{1}{\\sqrt{5}}\\begin{pmatrix} -1 \\\\ 2 \\end{pmatrix}$$`,
         explanation:
-          'Les deux lignes donnent la même contrainte $-x + 2y = 0$. En prenant $y = 1$, on obtient le vecteur directeur $(2, 1)^T$.',
-        keyRule: 'Calcul d’une base du noyau $\\ker(A - \\lambda_1 I)$',
+          'Le noyau est engendré par $(-1, 2)^T$, ce qui donne le vecteur normé $\\mathbf{v}_2$.',
+        keyRule: 'Sous-espace propre $\\ker(A)$',
       },
       {
         stepNumber: 4,
-        title: 'Normaliser à l’unité',
-        latexContent: `$$\\|\\mathbf{v}\\| = \\sqrt{2^2 + 1^2} = \\sqrt{5} \\implies \\mathbf{v}_1 = \\frac{1}{\\sqrt{5}} \\begin{pmatrix} 2 \\\\ 1 \\end{pmatrix}$$`,
+        title: 'Vérifier le produit scalaire nul',
+        latexContent: `$$\\langle \\mathbf{v}_1, \\mathbf{v}_2 \\rangle = \\frac{1}{5}\\big((2)(-1) + (1)(2)\\big) = 0 \\quad \\blacksquare$$`,
         explanation:
-          'On divise par la norme euclidienne pour obtenir un vecteur propre unitaire.',
-        keyRule: 'Normalisation euclidienne',
+          'Pour une matrice symétrique réelle, deux valeurs propres distinctes engendrent des sous-espaces propres orthogonaux.',
+        keyRule: 'Orthogonalité des sous-espaces propres',
       },
     ],
   },
 
-  numtheory_fermat_linear_congruence: {
-    title: 'Congruence linéaire modulaire via Euclide-Bézout',
-    latexStatement: `Trouver l’unique entier $x \\in \\{0, 1, \\dots, 28\\}$ vérifiant la congruence linéaire :
-$$17x \\equiv 5 \\pmod{29}$$`,
-    theoremContext: 'Identité de Bézout & inverse modulaire',
+  ns_adv_modular_inverse: {
+    title: 'Inversion modulaire constructive via Bézout',
+    topicTag: 'Structures modulaires · Arithmétique',
+    latexStatement: `Démontrer que la congruence $17x \\equiv 5 \\pmod{29}$ possède une unique solution $x \\in \\{0, 1, \\dots, 28\\}$ et la construire rigoureusement par l’algorithme d’Euclide étendu.`,
+    theoremContext: 'Identité de Bézout & corps $\\mathbb{Z}/29\\mathbb{Z}$',
     solvingSequences: [
       {
         stepNumber: 1,
-        title: 'Appliquer l’algorithme d’Euclide étendu',
-        latexContent: `$$29 = 17 \\cdot 1 + 12$$
-$$17 = 12 \\cdot 1 + 5$$
-$$12 = 5 \\cdot 2 + 2$$
-$$5 = 2 \\cdot 2 + 1$$`,
+        title: 'Prouver l’inversibilité par l’algorithme d’Euclide',
+        latexContent: `$$29 = 17 \\cdot 1 + 12, \\quad 17 = 12 \\cdot 1 + 5, \\quad 12 = 5 \\cdot 2 + 2, \\quad 5 = 2 \\cdot 2 + 1$$`,
         explanation:
-          'Les divisions euclidiennes successives atteignent le reste $1$, prouvant que $\\operatorname{pgcd}(17, 29) = 1$.',
-        keyRule: 'Algorithme d’Euclide',
+          'Le dernier reste non nul est $1$, donc $\\operatorname{pgcd}(17, 29) = 1$ et $17$ est inversible modulo $29$.',
+        keyRule: 'Critère d’inversibilité modulaire',
       },
       {
         stepNumber: 2,
-        title: 'Remonter les équations pour exprimer 1',
-        latexContent: `$$1 = 5 - 2(2) = 5 - 2(12 - 5\\cdot 2) = 5(5) - 2(12)$$
-$$1 = 5(17 - 12) - 2(12) = 5(17) - 7(12)$$
-$$1 = 5(17) - 7(29 - 17) = 12(17) - 7(29)$$`,
+        title: 'Construire les coefficients de Bézout',
+        latexContent: `$$1 = 5(17) - 7(12) = 5(17) - 7(29 - 17) = 12(17) - 7(29)$$`,
         explanation:
-          'La remontée donne l’identité de Bézout $12(17) + (-7)(29) = 1$.',
-        keyRule: 'Identité de Bézout : $au + bv = \\operatorname{pgcd}(a, b)$',
+          'La remontée des égalités exprime $1$ comme combinaison entière $12 \\cdot 17 - 7 \\cdot 29 = 1$.',
+        keyRule: 'Identité de Bézout',
       },
       {
         stepNumber: 3,
-        title: 'Extraire l’inverse modulaire',
+        title: 'Extraire l’inverse unique modulo 29',
         latexContent: `$$12 \\cdot 17 \\equiv 1 \\pmod{29} \\implies 17^{-1} \\equiv 12 \\pmod{29}$$`,
         explanation:
-          'Modulo $29$, le terme $-7(29)$ s’annule, ce qui montre que $12$ est l’inverse de $17$ modulo $29$.',
-        keyRule: 'Définition de l’inverse modulaire',
+          'Modulo $29$, le multiple de $29$ s’annule et $12$ est l’unique inverse de $17$.',
+        keyRule: 'Unicité de l’inverse dans un corps fini',
       },
       {
         stepNumber: 4,
-        title: 'Multiplier et réduire modulo 29',
-        latexContent: `$$x \\equiv 17^{-1} \\cdot 5 \\equiv 12 \\cdot 5 = 60 \\pmod{29}$$
-$$60 = 2 \\cdot 29 + 2 \\implies x \\equiv 2 \\pmod{29}$$`,
+        title: 'Résoudre et vérifier la congruence',
+        latexContent: `$$x \\equiv 12 \\cdot 5 = 60 \\equiv 2 \\pmod{29}, \\quad 17 \\cdot 2 = 34 \\equiv 5 \\pmod{29} \\quad \\blacksquare$$`,
         explanation:
-          'Vérification : $17 \\times 2 = 34 = 29 + 5 \\equiv 5 \\pmod{29}$.',
-        keyRule: 'Vérification : $17 \\cdot 2 = 34 \\equiv 5 \\pmod{29}$',
+          'La multiplication par $12$ isole $x = 2$, vérifié directement dans la congruence initiale.',
+        keyRule: 'Vérification canonique',
       },
     ],
   },
 
-  discrete_derangements_recursion: {
-    title: 'Nombre de dérangements de 5 éléments',
-    latexStatement: `Un dérangement est une permutation de $\\{1, 2, \\dots, n\\}$ sans aucun point fixe ($\\forall i, \\sigma(i) \\ne i$).
-Calculer $D_5$, le nombre de dérangements d’un ensemble à $n = 5$ éléments.`,
-    theoremContext: 'Principe d’inclusion-exclusion & sous-factorielle !n',
+  ns_adv_crt_system: {
+    title: 'Démonstration constructive du théorème des restes chinois',
+    topicTag: 'Structures algébriques · TRC',
+    latexStatement: `Soit le système de congruences simultanées :
+$$\\begin{cases} x \\equiv 2 \\pmod{3} \\\\ x \\equiv 3 \\pmod{5} \\\\ x \\equiv 2 \\pmod{7} \\end{cases}$$
+Démontrer l’existence et l’unicité d’une solution modulo $105$ et construire le plus petit entier positif ou nul $x$.`,
+    theoremContext: 'Isomorphisme d’anneaux du théorème des restes chinois',
     solvingSequences: [
       {
         stepNumber: 1,
-        title: 'Rappeler la formule fermée d’inclusion-exclusion',
-        latexContent: `$$D_n = n! \\left( \\frac{1}{0!} - \\frac{1}{1!} + \\frac{1}{2!} - \\frac{1}{3!} + \\cdots + \\frac{(-1)^n}{n!} \\right)$$`,
+        title: 'Prouver l’unicité et calculer les produits partiels',
+        latexContent: `$$M = 3 \\times 5 \\times 7 = 105, \\quad M_1 = 35, \\quad M_2 = 21, \\quad M_3 = 15$$`,
         explanation:
-          'Par le principe d’inclusion-exclusion, on alterne l’ajout et le retrait des points fixes.',
-        keyRule: 'Principe d’inclusion-exclusion (crible de Poincaré)',
+          'Comme $3, 5, 7$ sont deux à deux premiers entre eux, toute différence de deux solutions est divisible par $105$.',
+        keyRule: 'Unicité par coprimalité deux à deux',
       },
       {
         stepNumber: 2,
-        title: 'Évaluer les termes jusqu’à n = 5',
-        latexContent: `$$D_5 = 5! \\left( 1 - 1 + \\frac{1}{2} - \\frac{1}{6} + \\frac{1}{24} - \\frac{1}{120} \\right)$$
-$$5! = 120$$`,
+        title: 'Calculer les inverses locaux',
+        latexContent: `$$35y_1 \\equiv 1 \\pmod{3} \\Rightarrow y_1 = 2; \\quad 21y_2 \\equiv 1 \\pmod{5} \\Rightarrow y_2 = 1; \\quad 15y_3 \\equiv 1 \\pmod{7} \\Rightarrow y_3 = 1$$`,
         explanation:
-          'Les deux premiers termes $1 - 1$ s’annulent, puis on distribue $120$.',
-        keyRule: 'Calcul factoriel : $5! = 120$',
+          'Chaque produit $e_i = M_i y_i$ vaut $1$ modulo $m_i$ et $0$ modulo les autres modules.',
+        keyRule: 'Idempotents orthogonaux',
       },
       {
         stepNumber: 3,
-        title: 'Distribuer 120 sur chaque fraction',
-        latexContent: `$$D_5 = 120 \\cdot \\frac{1}{2} - 120 \\cdot \\frac{1}{6} + 120 \\cdot \\frac{1}{24} - 120 \\cdot \\frac{1}{120}$$
-$$D_5 = 60 - 20 + 5 - 1$$`,
-        explanation: 'Chaque quotient donne un entier exact.',
-        keyRule: 'Simplification arithmétique directe',
+        title: 'Former la superposition linéaire',
+        latexContent: `$$x_0 = 2(35)(2) + 3(21)(1) + 2(15)(1) = 140 + 63 + 30 = 233$$`,
+        explanation:
+          'La combinaison satisfait simultanément les trois congruences.',
+        keyRule: 'Formule constructive du TRC',
       },
       {
         stepNumber: 4,
-        title: 'Additionner les termes partiels',
-        latexContent: `$$D_5 = 40 + 4 = 44$$`,
+        title: 'Réduire modulo 105 et contrôler',
+        latexContent: `$$233 = 2 \\times 105 + 23 \\implies x = 23 \\quad \\blacksquare$$`,
         explanation:
-          'Parmi les $120$ permutations de $5$ éléments, exactement $44$ ne laissent aucun élément à sa place initiale.',
-        keyRule: 'Approximation asymptotique : $D_n \\approx \\lfloor n!/e + 1/2 \\rfloor$',
+          'On vérifie bien $23 \\equiv 2 \\pmod{3}$, $23 \\equiv 3 \\pmod{5}$ et $23 \\equiv 2 \\pmod{7}$.',
+        keyRule: 'Représentant canonique modulo 105',
       },
     ],
   },
 
-  calc_cyclic_integration_parts: {
-    title: 'Intégration par parties cyclique : produit exponentiel-trigonométrique',
-    latexStatement: `Déterminer la primitive générale :
-$$J = \\int e^{2x} \\cos(3x) \\, dx$$`,
-    theoremContext: 'Intégration par parties avec boucle algébrique',
-    solvingSequences: [
-      {
-        stepNumber: 1,
-        title: 'Première intégration par parties',
-        latexContent: `$$\\text{Soit } u = \\cos(3x) \\implies du = -3\\sin(3x)\\,dx$$
-$$dv = e^{2x}dx \\implies v = \\frac{1}{2}e^{2x}$$
-$$J = \\frac{1}{2}e^{2x}\\cos(3x) - \\int \\frac{1}{2}e^{2x} (-3\\sin(3x))\\,dx = \\frac{1}{2}e^{2x}\\cos(3x) + \\frac{3}{2} \\int e^{2x}\\sin(3x)\\,dx$$`,
-        explanation:
-          'En dérivant le terme trigonométrique et en intégrant l’exponentielle, on fait apparaître une intégrale en $\\sin(3x)$.',
-        keyRule: 'Intégration par parties : $\\int u\\,dv = uv - \\int v\\,du$',
-      },
-      {
-        stepNumber: 2,
-        title: 'Seconde intégration par parties sur l’intégrale auxiliaire',
-        latexContent: `$$\\text{Pour } K = \\int e^{2x}\\sin(3x)\\,dx : \\quad u = \\sin(3x) \\implies du = 3\\cos(3x)\\,dx, \\quad v = \\frac{1}{2}e^{2x}$$
-$$K = \\frac{1}{2}e^{2x}\\sin(3x) - \\frac{3}{2} \\int e^{2x}\\cos(3x)\\,dx = \\frac{1}{2}e^{2x}\\sin(3x) - \\frac{3}{2} J$$`,
-        explanation:
-          'En conservant le même ordre de dérivation/intégration, l’intégrale d’origine $J$ réapparaît.',
-        keyRule: 'Choix cohérent de $u$ et $dv$',
-      },
-      {
-        stepNumber: 3,
-        title: 'Substituer K dans l’expression de J',
-        latexContent: `$$J = \\frac{1}{2}e^{2x}\\cos(3x) + \\frac{3}{2} \\left( \\frac{1}{2}e^{2x}\\sin(3x) - \\frac{3}{2}J \\right)$$
-$$J = \\frac{1}{2}e^{2x}\\cos(3x) + \\frac{3}{4}e^{2x}\\sin(3x) - \\frac{9}{4}J$$`,
-        explanation:
-          'On obtient une équation algébrique linéaire dont l’inconnue est $J$.',
-        keyRule: 'Équation linéaire en l’intégrale $J$',
-      },
-      {
-        stepNumber: 4,
-        title: 'Isoler J et factoriser',
-        latexContent: `$$J + \\frac{9}{4}J = \\frac{13}{4}J = \\frac{e^{2x}}{4}\\big(2\\cos(3x) + 3\\sin(3x)\\big)$$
-$$J = \\frac{4}{13} \\cdot \\frac{e^{2x}}{4}\\big(2\\cos(3x) + 3\\sin(3x)\\big) + C = \\frac{e^{2x}}{13}\\big(2\\cos(3x) + 3\\sin(3x)\\big) + C$$`,
-        explanation:
-          'En multipliant par $4/13$ et en ajoutant la constante d’intégration $C$, on obtient la primitive exacte.',
-        keyRule: 'Isolement algébrique des intégrales cycliques',
-      },
-    ],
-  },
-
-  linalg_gram_schmidt: {
-    title: 'Orthonormalisation de Gram-Schmidt dans ℝ³',
-    latexStatement: `Soit les deux vecteurs linéairement indépendants dans $\\mathbb{R}^3$ :
-$$\\mathbf{v}_1 = \\begin{pmatrix} 1 \\\\ 1 \\\\ 0 \\end{pmatrix}, \\quad \\mathbf{v}_2 = \\begin{pmatrix} 1 \\\\ 0 \\\\ 1 \\end{pmatrix}$$
-Appliquer le procédé de Gram-Schmidt pour déterminer le vecteur orthogonal $\\mathbf{u}_2$ (orthogonal à $\\mathbf{u}_1 = \\mathbf{v}_1$) puis le vecteur unitaire $\\mathbf{e}_2$.`,
-    theoremContext: 'Procédé de Gram-Schmidt & projections orthogonales',
-    solvingSequences: [
-      {
-        stepNumber: 1,
-        title: 'Fixer le premier vecteur orthogonal',
-        latexContent: `$$\\mathbf{u}_1 = \\mathbf{v}_1 = \\begin{pmatrix} 1 \\\\ 1 \\\\ 0 \\end{pmatrix}, \\quad \\|\\mathbf{u}_1\\|^2 = 1^2 + 1^2 + 0^2 = 2$$`,
-        explanation:
-          'Le premier vecteur sert directement de direction de référence.',
-        keyRule: 'Initialisation de Gram-Schmidt : $\\mathbf{u}_1 = \\mathbf{v}_1$',
-      },
-      {
-        stepNumber: 2,
-        title: 'Calculer le produit scalaire et la projection',
-        latexContent: `$$\\langle \\mathbf{v}_2, \\mathbf{u}_1 \\rangle = (1)(1) + (0)(1) + (1)(0) = 1$$
-$$\\text{proj}_{\\mathbf{u}_1}(\\mathbf{v}_2) = \\frac{\\langle \\mathbf{v}_2, \\mathbf{u}_1 \\rangle}{\\|\\mathbf{u}_1\\|^2} \\mathbf{u}_1 = \\frac{1}{2} \\begin{pmatrix} 1 \\\\ 1 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 1/2 \\\\ 1/2 \\\\ 0 \\end{pmatrix}$$`,
-        explanation:
-          'On projette orthogonalement $\\mathbf{v}_2$ sur la droite engendrée par $\\mathbf{u}_1$.',
-        keyRule: 'Projection orthogonale : $\\text{proj}_{u}(v) = \\frac{v \\cdot u}{\\|u\\|^2} u$',
-      },
-      {
-        stepNumber: 3,
-        title: 'Soustraire la composante parallèle',
-        latexContent: `$$\\mathbf{u}_2 = \\mathbf{v}_2 - \\text{proj}_{\\mathbf{u}_1}(\\mathbf{v}_2) = \\begin{pmatrix} 1 \\\\ 0 \\\\ 1 \\end{pmatrix} - \\begin{pmatrix} 1/2 \\\\ 1/2 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 1/2 \\\\ -1/2 \\\\ 1 \\end{pmatrix}$$`,
-        explanation:
-          'On vérifie l’orthogonalité : $\\langle \\mathbf{u}_2, \\mathbf{u}_1 \\rangle = 1/2 - 1/2 + 0 = 0$.',
-        keyRule: 'Condition d’orthogonalité : $\\langle \\mathbf{u}_2, \\mathbf{u}_1 \\rangle = 0$',
-      },
-      {
-        stepNumber: 4,
-        title: 'Normaliser le vecteur obtenu',
-        latexContent: `$$\\|\\mathbf{u}_2\\| = \\sqrt{(1/2)^2 + (-1/2)^2 + 1^2} = \\sqrt{1/4 + 1/4 + 1} = \\sqrt{3/2} = \\frac{\\sqrt{6}}{2}$$
-$$\\mathbf{e}_2 = \\frac{\\mathbf{u}_2}{\\|\\mathbf{u}_2\\|} = \\frac{2}{\\sqrt{6}} \\begin{pmatrix} 1/2 \\\\ -1/2 \\\\ 1 \\end{pmatrix} = \\frac{1}{\\sqrt{6}}\\begin{pmatrix} 1 \\\\ -1 \\\\ 2 \\end{pmatrix}$$`,
-        explanation:
-          'La division par la norme produit un vecteur unitaire formant un système orthonormé avec $\\mathbf{e}_1$.',
-        keyRule: 'Normalisation : $\\mathbf{e}_i = \\mathbf{u}_i / \\|\\mathbf{u}_i\\|$',
-      },
-    ],
-  },
-
-  numtheory_chinese_remainder: {
-    title: 'Système de congruences par le théorème des restes chinois',
-    latexStatement: `Trouver le plus petit entier positif ou nul $x$ vérifiant simultanément :
-$$\\begin{cases} x \\equiv 2 \\pmod{3} \\\\ x \\equiv 3 \\pmod{5} \\\\ x \\equiv 2 \\pmod{7} \\end{cases}$$`,
-    theoremContext: 'Théorème des restes chinois (modules deux à deux premiers entre eux)',
-    solvingSequences: [
-      {
-        stepNumber: 1,
-        title: 'Calculer le module global et les produits partiels',
-        latexContent: `$$M = 3 \\times 5 \\times 7 = 105$$
-$$M_1 = \\frac{105}{3} = 35, \\quad M_2 = \\frac{105}{5} = 21, \\quad M_3 = \\frac{105}{7} = 15$$`,
-        explanation:
-          'Les modules $3, 5, 7$ étant deux à deux premiers entre eux, il existe une solution unique modulo $105$.',
-        keyRule: 'Existence et unicité par le théorème des restes chinois',
-      },
-      {
-        stepNumber: 2,
-        title: 'Calculer les inverses modulaires partiels',
-        latexContent: `$$M_1 y_1 \\equiv 1 \\pmod{3} \\implies 35 y_1 \\equiv 2 y_1 \\equiv 1 \\pmod{3} \\implies y_1 = 2$$
-$$M_2 y_2 \\equiv 1 \\pmod{5} \\implies 21 y_2 \\equiv 1 y_2 \\equiv 1 \\pmod{5} \\implies y_2 = 1$$
-$$M_3 y_3 \\equiv 1 \\pmod{7} \\implies 15 y_3 \\equiv 1 y_3 \\equiv 1 \\pmod{7} \\implies y_3 = 1$$`,
-        explanation:
-          'On résout chaque congruence $M_i y_i \\equiv 1 \\pmod{m_i}$.',
-        keyRule: 'Inverses modulaires locaux',
-      },
-      {
-        stepNumber: 3,
-        title: 'Construire la combinaison linéaire',
-        latexContent: `$$x = \\sum_{i=1}^{3} a_i M_i y_i$$
-$$x = 2(35)(2) + 3(21)(1) + 2(15)(1) = 140 + 63 + 30 = 233$$`,
-        explanation:
-          'Cette somme vérifie chaque congruence car les autres termes sont divisibles par $m_i$.',
-        keyRule: 'Superposition constructive du TRC',
-      },
-      {
-        stepNumber: 4,
-        title: 'Réduire modulo 105',
-        latexContent: `$$x \\equiv 233 \\pmod{105}$$
-$$233 = 2 \\times 105 + 23 \\implies x = 23$$`,
-        explanation:
-          'Vérification : $23 \\equiv 2 \\pmod{3}$, $23 \\equiv 3 \\pmod{5}$ et $23 \\equiv 2 \\pmod{7}$.',
-        keyRule: 'Représentant canonique dans $[0, 104]$',
-      },
-    ],
-  },
-
-  discrete_catalan_formula: {
-    title: 'Le 4e nombre de Catalan et les chemins de Dyck',
-    latexStatement: `Soit $C_n$ le $n$-ième nombre de Catalan, qui dénombre les chemins de Dyck de $(0,0)$ à $(n,n)$ ne dépassant jamais la droite $y = x$.
-Calculer $C_4$ à l’aide du principe de réflexion ou de la formule binomiale.`,
-    theoremContext: 'Principe de réflexion d’André & nombres de Catalan',
-    solvingSequences: [
-      {
-        stepNumber: 1,
-        title: 'Rappeler la formule fermée',
-        latexContent: `$$C_n = \\frac{1}{n+1} \\binom{2n}{n}$$
-$$\\text{Pour } n = 4 : \\quad C_4 = \\frac{1}{5} \\binom{8}{4}$$`,
-        explanation:
-          'Les nombres de Catalan comptent aussi les parenthésages bien formés et les arbres binaires.',
-        keyRule: 'Formule fermée des nombres de Catalan',
-      },
-      {
-        stepNumber: 2,
-        title: 'Calculer le coefficient binomial central',
-        latexContent: `$$\\binom{8}{4} = \\frac{8 \\times 7 \\times 6 \\times 5}{4 \\times 3 \\times 2 \\times 1} = \\frac{1680}{24} = 70$$`,
-        explanation:
-          '$\\binom{8}{4} = 70$ correspond à l’ensemble des chemins monotones de $(0,0)$ à $(4,4)$.',
-        keyRule: 'Combinaisons $\\binom{n}{k} = \\frac{n!}{k!(n-k)!}$',
-      },
-      {
-        stepNumber: 3,
-        title: 'Appliquer le principe de réflexion d’André',
-        latexContent: `$$\\text{Chemins invalides touchant } y = x+1 : \\quad \\binom{8}{3} = \\frac{8 \\times 7 \\times 6}{3 \\times 2 \\times 1} = 56$$
-$$C_4 = \\binom{8}{4} - \\binom{8}{3} = 70 - 56 = 14$$`,
-        explanation:
-          'La réflexion après le premier contact avec $y = x+1$ établit une bijection vers les chemins aboutissant en $(3, 5)$.',
-        keyRule: 'Principe de réflexion d’André',
-      },
-      {
-        stepNumber: 4,
-        title: 'Vérification par division directe',
-        latexContent: `$$C_4 = \\frac{70}{5} = 14$$`,
-        explanation:
-          'Les deux méthodes donnent la suite : $C_0 = 1, C_1 = 1, C_2 = 2, C_3 = 5, C_4 = 14$.',
-        keyRule: 'Quotient direct : $70 / 5 = 14$',
-      },
-    ],
-  },
-
-  calc_multivariable_lagrange: {
-    title: 'Extremum sous contrainte par multiplicateurs de Lagrange',
-    latexStatement: `Déterminer le maximum de la fonction linéaire $f(x, y, z) = 2x + y + 2z$ sous la contrainte sphérique :
-$$x^2 + y^2 + z^2 = 9$$`,
-    theoremContext: 'Théorème des multiplicateurs de Lagrange sur un compact',
-    solvingSequences: [
-      {
-        stepNumber: 1,
-        title: 'Calculer les vecteurs gradients',
-        latexContent: `$$\\nabla f = \\begin{pmatrix} 2 \\\\ 1 \\\\ 2 \\end{pmatrix}, \\quad \\nabla g = \\begin{pmatrix} 2x \\\\ 2y \\\\ 2z \\end{pmatrix}$$`,
-        explanation:
-          'En un extremum lié régulier, le gradient de $f$ est colinéaire au gradient de la contrainte $g(x,y,z) = x^2+y^2+z^2-9$.',
-        keyRule: 'Condition de Lagrange : $\\nabla f = \\lambda \\nabla g$',
-      },
-      {
-        stepNumber: 2,
-        title: 'Exprimer les coordonnées en fonction de λ',
-        latexContent: `$$2 = 2\\lambda x \\implies x = \\frac{1}{\\lambda}, \\quad y = \\frac{1}{2\\lambda}, \\quad z = \\frac{1}{\\lambda}$$`,
-        explanation:
-          'Comme $\\nabla f \\ne \\mathbf{0}$, $\\lambda$ est nécessairement non nul.',
-        keyRule: 'Paramétrage par le multiplicateur $\\lambda$',
-      },
-      {
-        stepNumber: 3,
-        title: 'Injecter dans l’équation de la sphère',
-        latexContent: `$$\\frac{1}{\\lambda^2} \\left( 1 + \\frac{1}{4} + 1 \\right) = \\frac{9}{4\\lambda^2} = 9 \\implies 4\\lambda^2 = 1 \\implies \\lambda = \\pm \\frac{1}{2}$$`,
-        explanation:
-          'On obtient deux points critiques correspondant respectivement au maximum et au minimum globaux.',
-        keyRule: 'Substitution dans la contrainte',
-      },
-      {
-        stepNumber: 4,
-        title: 'Évaluer le maximum au multiplicateur positif',
-        latexContent: `$$\\text{Pour } \\lambda = \\frac{1}{2} : \\quad x = 2, \\quad y = 1, \\quad z = 2$$
-$$f(2, 1, 2) = 2(2) + 1 + 2(2) = 9$$`,
-        explanation:
-          'Par l’inégalité de Cauchy-Schwarz, $f \\le \\sqrt{4+1+4}\\sqrt{9} = 9$ ; le maximum vaut bien $9$.',
-        keyRule: 'Confirmation par Cauchy-Schwarz',
-      },
-    ],
-  },
-
-  linalg_cayley_hamilton_powers: {
-    title: 'Puissances d’une matrice par décomposition nilpotente',
+  ns_adv_jordan_nilpotent: {
+    title: 'Décomposition nilpotente & puissance matricielle par récurrence',
+    topicTag: 'Algèbres matricielles · Jordan',
     latexStatement: `Soit $A = \\begin{pmatrix} 1 & 2 \\\\ 0 & 1 \\end{pmatrix}$.
-À l’aide du théorème de Cayley-Hamilton ou de la formule du binôme de Newton sur la décomposition $A = I + N$, calculer $A^{10}$.`,
-    theoremContext: 'Théorème de Cayley-Hamilton & réduction de Jordan',
+À l’aide de la décomposition $A = I + N$ et de la nilpotence de $N$, démontrer que pour tout $n \\ge 1$, $A^n = \\begin{pmatrix} 1 & 2n \\\\ 0 & 1 \\end{pmatrix}$, puis en déduire $A^{10}$.`,
+    theoremContext: 'Binôme de Newton matriciel & nilpotence',
     solvingSequences: [
       {
         stepNumber: 1,
-        title: 'Décomposer A en identité plus matrice nilpotente',
-        latexContent: `$$A = I + N, \\quad I = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}, \\quad N = \\begin{pmatrix} 0 & 2 \\\\ 0 & 0 \\end{pmatrix}$$`,
+        title: 'Écrire A = I + N et justifier la commutation',
+        latexContent: `$$A = I + N, \\quad N = \\begin{pmatrix} 0 & 2 \\\\ 0 & 0 \\end{pmatrix}, \\quad IN = NI$$`,
         explanation:
-          'Comme $I$ et $N$ commutent ($IN = NI$), la formule du binôme de Newton s’applique aux matrices.',
-        keyRule: 'Formule du binôme pour matrices qui commutent',
+          'Comme $I$ commute avec $N$, le développement du binôme de Newton s’applique à $(I+N)^n$.',
+        keyRule: 'Commutation $IN = NI$',
       },
       {
         stepNumber: 2,
-        title: 'Vérifier la nilpotence de N',
-        latexContent: `$$N^2 = \\begin{pmatrix} 0 & 2 \\\\ 0 & 0 \\end{pmatrix} \\begin{pmatrix} 0 & 2 \\\\ 0 & 0 \\end{pmatrix} = \\begin{pmatrix} 0 & 0 \\\\ 0 & 0 \\end{pmatrix} = \\mathbf{0}$$
-$$N^k = \\mathbf{0} \\quad \\forall k \\ge 2$$`,
+        title: 'Prouver la nilpotence d’indice 2',
+        latexContent: `$$N^2 = \\begin{pmatrix} 0 & 0 \\\\ 0 & 0 \\end{pmatrix} = \\mathbf{0} \\implies N^k = \\mathbf{0} \\quad \\forall k \\ge 2$$`,
         explanation:
-          'La matrice $N$ est nilpotente d’indice 2 : toutes les puissances d’ordre $\\ge 2$ sont nulles.',
-        keyRule: 'Nilpotence d’indice 2 : $N^2 = \\mathbf{0}$',
+          'Toutes les puissances de $N$ d’exposant supérieur ou égal à $2$ sont nulles.',
+        keyRule: 'Nilpotence $N^2 = \\mathbf{0}$',
       },
       {
         stepNumber: 3,
-        title: 'Tronquer le développement binomial à l’ordre 1',
-        latexContent: `$$A^{10} = (I + N)^{10} = I + 10N + \\sum_{k=2}^{10} \\binom{10}{k} N^k = I + 10N$$`,
-        explanation:
-          'Seuls les termes de degrés 0 et 1 subsistent dans la somme.',
-        keyRule: 'Troncature d’une série finie',
+        title: 'Tronquer la somme binomiale',
+        latexContent: `$$A^n = \\sum_{k=0}^{n} \\binom{n}{k} N^k = I + nN$$`,
+        explanation: 'Seuls les deux premiers termes subsistent.',
+        keyRule: 'Troncature exacte à l’ordre 1',
       },
       {
         stepNumber: 4,
-        title: 'Assembler la matrice finale',
-        latexContent: `$$A^{10} = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix} + 10 \\begin{pmatrix} 0 & 2 \\\\ 0 & 0 \\end{pmatrix} = \\begin{pmatrix} 1 & 20 \\\\ 0 & 1 \\end{pmatrix}$$`,
+        title: 'Conclure pour tout n et pour n = 10',
+        latexContent: `$$A^n = \\begin{pmatrix} 1 & 2n \\\\ 0 & 1 \\end{pmatrix}, \\qquad A^{10} = \\begin{pmatrix} 1 & 20 \\\\ 0 & 1 \\end{pmatrix} \\quad \\blacksquare$$`,
         explanation:
-          'On obtient exactement $A^{10} = \\begin{pmatrix} 1 & 20 \\\\ 0 & 1 \\end{pmatrix}$.',
+          'En remplaçant $n = 10$, on obtient directement $A^{10}$.',
         keyRule: 'Puissance d’un bloc de Jordan',
       },
     ],
   },
 
-  numtheory_euler_totient_coprime: {
-    title: 'Théorème d’Euler et réduction modulaire de grandes puissances',
-    latexStatement: `Trouver les deux derniers chiffres de l’écriture décimale de $7^{102}$, c’est-à-dire calculer :
-$$7^{102} \\pmod{100}$$`,
-    theoremContext: 'Théorème d’Euler & indicatrice φ(n)',
+  av_basic_mvt_lipschitz: {
+    title: 'Inégalité lipschitzienne du sinus par le TAF',
+    topicTag: 'Calcul différentiel · Accroissements finis',
+    latexStatement: `À l’aide du théorème des accroissements finis, démontrer que pour tous réels $a, b \\in \\mathbb{R}$ :
+$$|\\sin b - \\sin a| \\le |b - a|$$`,
+    theoremContext: 'Théorème des accroissements finis',
     solvingSequences: [
       {
         stepNumber: 1,
-        title: 'Calculer l’indicatrice d’Euler φ(100)',
-        latexContent: `$$100 = 2^2 \\times 5^2$$
-$$\\varphi(100) = 100 \\left(1 - \\frac{1}{2}\\right)\\left(1 - \\frac{1}{5}\\right) = 100 \\times \\frac{1}{2} \\times \\frac{4}{5} = 40$$`,
+        title: 'Traiter le cas a = b',
+        latexContent: `$$a = b \\implies |\\sin b - \\sin a| = 0 \\le |b - a|$$`,
         explanation:
-          'L’indicatrice $\\varphi(100)$ compte les entiers compris entre $1$ et $100$ qui sont premiers avec $100$.',
-        keyRule: 'Formule multiplicative de l’indicatrice d’Euler',
+          'L’inégalité est immédiate lorsque $a = b$. On suppose désormais $a < b$ sans perte de généralité.',
+        keyRule: 'Disjonction de cas & symétrie',
       },
       {
         stepNumber: 2,
-        title: 'Appliquer le théorème d’Euler',
-        latexContent: `$$\\operatorname{pgcd}(7, 100) = 1 \\implies 7^{\\varphi(100)} \\equiv 7^{40} \\equiv 1 \\pmod{100}$$`,
+        title: 'Vérifier les hypothèses du théorème',
+        latexContent: `$$f(x) = \\sin x \\text{ est continue sur } [a,b] \\text{ et dérivable sur } (a,b), \\; f'(x) = \\cos x$$`,
         explanation:
-          'Tout entier premier avec $100$ élevé à la puissance $40$ est congru à $1$ modulo $100$.',
-        keyRule: 'Théorème d’Euler : $a^{\\varphi(m)} \\equiv 1 \\pmod{m}$',
+          'La fonction sinus est dérivable partout sur $\\mathbb{R}$, donc les hypothèses sont satisfaites.',
+        keyRule: 'Régularité de $\\sin x$',
       },
       {
         stepNumber: 3,
-        title: 'Réduire l’exposant par division euclidienne',
-        latexContent: `$$102 = 40 \\times 2 + 22 \\implies 7^{102} \\equiv (7^{40})^2 \\cdot 7^{22} \\equiv 7^{22} \\pmod{100}$$`,
+        title: 'Appliquer le théorème des accroissements finis',
+        latexContent: `$$\\exists c \\in (a, b) \\text{ tel que } \\frac{\\sin b - \\sin a}{b - a} = \\cos c$$`,
         explanation:
-          'On ramène l’exposant de $102$ à $22$, que l’on peut encore réduire grâce à $7^4 = 2401 \\equiv 1 \\pmod{100}$.',
-        keyRule: 'Réduction modulaire de l’exposant',
+          'Le taux d’accroissement égale la dérivée en au moins un point intérieur $c$.',
+        keyRule: 'Égalité des accroissements finis',
       },
       {
         stepNumber: 4,
-        title: 'Conclure avec le sous-cycle d’ordre 4',
-        latexContent: `$$7^2 = 49, \\quad 7^4 = 2401 \\equiv 1 \\pmod{100}$$
-$$7^{102} = (7^4)^{25} \\cdot 7^2 \\equiv 1^{25} \\cdot 49 \\equiv 49 \\pmod{100}$$`,
+        title: 'Majorer par |cos c| ≤ 1',
+        latexContent: `$$|\\sin b - \\sin a| = |\\cos c|\\,|b - a| \\le |b - a| \\quad \\blacksquare$$`,
         explanation:
-          'L’ordre multiplicatif de $7$ modulo $100$ vaut $4$. Les deux derniers chiffres sont donc $49$.',
-        keyRule: 'Ordre multiplicatif modulo 100',
+          'Comme $|\\cos c| \\le 1$ pour tout réel $c$, l’inégalité est démontrée.',
+        keyRule: 'Borne $|\\cos c| \\le 1$',
+      },
+    ],
+  },
+
+  av_basic_cyclic_ibp: {
+    title: 'Intégration par parties cyclique & vérification',
+    topicTag: 'Analyse · Primitives',
+    latexStatement: `Établir puis vérifier par dérivation l’expression fermée de la primitive :
+$$J = \\int e^{2x} \\cos(3x) \\, dx$$`,
+    theoremContext: 'Intégration par parties & théorème fondamental de l’analyse',
+    solvingSequences: [
+      {
+        stepNumber: 1,
+        title: 'Première intégration par parties',
+        latexContent: `$$u = \\cos(3x), \\; dv = e^{2x}dx \\implies J = \\frac{1}{2}e^{2x}\\cos(3x) + \\frac{3}{2}\\int e^{2x}\\sin(3x)\\,dx$$`,
+        explanation:
+          'En dérivant le facteur trigonométrique, on fait apparaître l’intégrale auxiliaire en $\\sin(3x)$.',
+        keyRule: 'Intégration par parties',
+      },
+      {
+        stepNumber: 2,
+        title: 'Seconde intégration par parties',
+        latexContent: `$$\\int e^{2x}\\sin(3x)\\,dx = \\frac{1}{2}e^{2x}\\sin(3x) - \\frac{3}{2}J$$`,
+        explanation:
+          'Une deuxième intégration par parties dans le même sens ramène l’intégrale initiale $J$.',
+        keyRule: 'Boucle algébrique cohérente',
+      },
+      {
+        stepNumber: 3,
+        title: 'Isoler J algébriquement',
+        latexContent: `$$\\frac{13}{4}J = \\frac{e^{2x}}{4}\\big(2\\cos(3x) + 3\\sin(3x)\\big) \\implies J = \\frac{e^{2x}}{13}\\big(2\\cos(3x) + 3\\sin(3x)\\big) + C$$`,
+        explanation:
+          'On résout l’équation linéaire en $J$ pour obtenir la formule fermée.',
+        keyRule: 'Résolution linéaire en $J$',
+      },
+      {
+        stepNumber: 4,
+        title: 'Vérifier par dérivation directe',
+        latexContent: `$$\\frac{d}{dx}\\left[\\frac{e^{2x}}{13}(2\\cos 3x + 3\\sin 3x)\\right] = e^{2x}\\cos(3x) \\quad \\blacksquare$$`,
+        explanation:
+          'La règle du produit annule exactement les termes en $\\sin(3x)$ et restitue $e^{2x}\\cos(3x)$.',
+        keyRule: 'Contrôle par dérivation',
+      },
+    ],
+  },
+
+  av_basic_gram_schmidt: {
+    title: 'Projection orthogonale & procédé de Gram-Schmidt',
+    topicTag: 'Vecteurs · Produit scalaire',
+    latexStatement: `Dans $\\mathbb{R}^3$ muni du produit scalaire usuel, soit :
+$$\\mathbf{v}_1 = \\begin{pmatrix} 1 \\\\ 1 \\\\ 0 \\end{pmatrix}, \\quad \\mathbf{v}_2 = \\begin{pmatrix} 1 \\\\ 0 \\\\ 1 \\end{pmatrix}$$
+On pose $\\mathbf{u}_1 = \\mathbf{v}_1$ et $\\mathbf{u}_2 = \\mathbf{v}_2 - \\operatorname{proj}_{\\mathbf{u}_1}(\\mathbf{v}_2)$. Démontrer que $\\langle \\mathbf{u}_2, \\mathbf{u}_1 \\rangle = 0$ et déterminer la famille orthonormée $(\\mathbf{e}_1, \\mathbf{e}_2)$.`,
+    theoremContext: 'Projection orthogonale & procédé de Gram-Schmidt',
+    solvingSequences: [
+      {
+        stepNumber: 1,
+        title: 'Prouver l’orthogonalité du résidu de projection',
+        latexContent: `$$\\left\\langle \\mathbf{v}_2 - \\frac{\\langle \\mathbf{v}_2, \\mathbf{u}_1 \\rangle}{\\|\\mathbf{u}_1\\|^2}\\mathbf{u}_1,\\, \\mathbf{u}_1 \\right\\rangle = \\langle \\mathbf{v}_2, \\mathbf{u}_1 \\rangle - \\langle \\mathbf{v}_2, \\mathbf{u}_1 \\rangle = 0$$`,
+        explanation:
+          'Par bilinéarité du produit scalaire, soustraire la projection annule le produit scalaire avec $\\mathbf{u}_1$.',
+        keyRule: 'Bilinéarité du produit scalaire',
+      },
+      {
+        stepNumber: 2,
+        title: 'Calculer la composante projetée',
+        latexContent: `$$\\|\\mathbf{u}_1\\|^2 = 2, \\; \\langle \\mathbf{v}_2, \\mathbf{u}_1 \\rangle = 1 \\implies \\operatorname{proj}_{\\mathbf{u}_1}(\\mathbf{v}_2) = \\begin{pmatrix}1/2\\\\1/2\\\\0\\end{pmatrix}$$`,
+        explanation:
+          'On calcule le coefficient de projection égal à $1/2$.',
+        keyRule: 'Formule de projection',
+      },
+      {
+        stepNumber: 3,
+        title: 'Calculer u₂ et contrôler l’orthogonalité',
+        latexContent: `$$\\mathbf{u}_2 = \\begin{pmatrix}1/2\\\\-1/2\\\\1\\end{pmatrix}, \\qquad \\langle \\mathbf{u}_2, \\mathbf{u}_1 \\rangle = \\frac{1}{2} - \\frac{1}{2} + 0 = 0$$`,
+        explanation:
+          'Le vecteur $\\mathbf{u}_2$ obtenu est bien orthogonal à $\\mathbf{u}_1$.',
+        keyRule: 'Contrôle d’orthogonalité',
+      },
+      {
+        stepNumber: 4,
+        title: 'Normaliser en une base orthonormée',
+        latexContent: `$$\\mathbf{e}_1 = \\frac{1}{\\sqrt{2}}\\begin{pmatrix}1\\\\1\\\\0\\end{pmatrix}, \\qquad \\mathbf{e}_2 = \\frac{1}{\\sqrt{6}}\\begin{pmatrix}1\\\\-1\\\\2\\end{pmatrix} \\quad \\blacksquare$$`,
+        explanation:
+          'En divisant par $\\|\\mathbf{u}_1\\| = \\sqrt{2}$ et $\\|\\mathbf{u}_2\\| = \\sqrt{6}/2$, on obtient une paire orthonormée.',
+        keyRule: 'Normalisation unitaire',
+      },
+    ],
+  },
+
+  av_adv_gaussian_integral: {
+    title: 'Démonstration de l’intégrale gaussienne en coordonnées polaires',
+    topicTag: 'Intégrales impropres · Fubini-Tonelli',
+    latexStatement: `Démontrer rigoureusement que l’intégrale impropre converge vers $\\sqrt{\\pi}$ :
+$$I = \\int_{-\\infty}^{\\infty} e^{-x^2} \\, dx = \\sqrt{\\pi}$$`,
+    theoremContext: 'Théorème de Fubini-Tonelli & jacobien polaire',
+    solvingSequences: [
+      {
+        stepNumber: 1,
+        title: 'Justifier la convergence et former l’intégrale double I²',
+        latexContent: `$$e^{-x^2} \\le e^{-|x|} \\; (|x|\\ge 1) \\implies I < \\infty; \\quad I^2 = \\iint_{\\mathbb{R}^2} e^{-(x^2+y^2)}\\,dx\\,dy$$`,
+        explanation:
+          'La comparaison assure la convergence, et le théorème de Tonelli permet de regrouper les intégrales.',
+        keyRule: 'Théorème de Tonelli',
+      },
+      {
+        stepNumber: 2,
+        title: 'Passer en coordonnées polaires',
+        latexContent: `$$I^2 = \\int_0^{2\\pi} d\\theta \\int_0^\\infty r e^{-r^2}\\,dr$$`,
+        explanation:
+          'Le jacobien du passage en coordonnées polaires introduit le facteur $r$.',
+        keyRule: 'Jacobien polaire $r\\,dr\\,d\\theta$',
+      },
+      {
+        stepNumber: 3,
+        title: 'Calculer l’intégrale radiale',
+        latexContent: `$$\\int_0^R r e^{-r^2}\\,dr = \\frac{1}{2}(1 - e^{-R^2}) \\xrightarrow{R\\to\\infty} \\frac{1}{2}$$`,
+        explanation:
+          'La primitive immédiate donne la limite $1/2$.',
+        keyRule: 'Limite de l’intégrale radiale',
+      },
+      {
+        stepNumber: 4,
+        title: 'Conclure par positivité de I',
+        latexContent: `$$I^2 = 2\\pi \\cdot \\frac{1}{2} = \\pi, \\; I > 0 \\implies I = \\sqrt{\\pi} \\quad \\blacksquare$$`,
+        explanation:
+          'Comme l’intégrande est strictement positif, $I > 0$, d’où $I = \\sqrt{\\pi}$.',
+        keyRule: 'Positivité stricte',
+      },
+    ],
+  },
+
+  av_adv_lagrange_sphere: {
+    title: 'Maximum sous contrainte par Lagrange & Cauchy-Schwarz',
+    topicTag: 'Analyse multivariable · Optimisation',
+    latexStatement: `Démontrer que le maximum de $f(x, y, z) = 2x + y + 2z$ sur la sphère compacte $S = \\{(x,y,z) \\in \\mathbb{R}^3 : x^2 + y^2 + z^2 = 9\\}$ vaut $9$, à l’aide des multiplicateurs de Lagrange puis de l’inégalité de Cauchy-Schwarz.`,
+    theoremContext: 'Multiplicateurs de Lagrange sur un compact',
+    solvingSequences: [
+      {
+        stepNumber: 1,
+        title: 'Justifier la compacité et la colinéarité des gradients',
+        latexContent: `$$\\nabla g = (2x, 2y, 2z) \\ne \\mathbf{0} \\text{ sur } S, \\quad \\nabla f = \\lambda \\nabla g \\implies (2,1,2) = \\lambda(2x, 2y, 2z)$$`,
+        explanation:
+          'La continuité de $f$ sur le compact $S$ assure l’existence d’un extremum, où les gradients sont colinéaires.',
+        keyRule: 'Condition de Lagrange',
+      },
+      {
+        stepNumber: 2,
+        title: 'Exprimer (x, y, z) en fonction de λ',
+        latexContent: `$$x = \\frac{1}{\\lambda}, \\quad y = \\frac{1}{2\\lambda}, \\quad z = \\frac{1}{\\lambda}$$`,
+        explanation:
+          'L’identification coordonnée par coordonnée paramètre les points critiques par $\\lambda$.',
+        keyRule: 'Paramétrage des points critiques',
+      },
+      {
+        stepNumber: 3,
+        title: 'Injecter dans la contrainte sphérique',
+        latexContent: `$$\\frac{9}{4\\lambda^2} = 9 \\implies \\lambda = \\pm\\frac{1}{2}; \\quad f(2,1,2) = 9, \\; f(-2,-1,-2) = -9$$`,
+        explanation:
+          'Le multiplicateur positif donne le maximum global $+9$.',
+        keyRule: 'Comparaison sur le compact',
+      },
+      {
+        stepNumber: 4,
+        title: 'Confirmer par Cauchy-Schwarz',
+        latexContent: `$$f(x,y,z) \\le \\|(2,1,2)\\| \\|(x,y,z)\\| = 3 \\cdot 3 = 9 \\quad \\blacksquare$$`,
+        explanation:
+          'L’inégalité de Cauchy-Schwarz certifie globalement que $9$ est la borne supérieure atteinte.',
+        keyRule: 'Confirmation par Cauchy-Schwarz',
+      },
+    ],
+  },
+
+  av_adv_basel_series: {
+    title: 'Démonstration d’Euler du problème de Bâle ζ(2) = π²/6',
+    topicTag: 'Séries infinies · Développements analytiques',
+    latexStatement: `Démontrer la formule fermée d’Euler pour la somme des inverses des carrés :
+$$\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}$$`,
+    theoremContext: 'Série de Maclaurin & produit infini de sin(x)/x',
+    solvingSequences: [
+      {
+        stepNumber: 1,
+        title: 'Développement en série de Maclaurin de sin(x)/x',
+        latexContent: `$$\\frac{\\sin x}{x} = 1 - \\frac{x^2}{6} + \\frac{x^4}{120} - \\cdots$$`,
+        explanation:
+          'En divisant la série de $\\sin x$ par $x$, le coefficient en $x^2$ vaut $-1/6$.',
+        keyRule: 'Développement de Maclaurin',
+      },
+      {
+        stepNumber: 2,
+        title: 'Factorisation en produit infini par les racines',
+        latexContent: `$$\\frac{\\sin x}{x} = \\prod_{n=1}^{\\infty} \\left(1 - \\frac{x^2}{n^2\\pi^2}\\right)$$`,
+        explanation:
+          'Les racines non nulles de $\\sin x / x$ étant $\\pm n\\pi$, le produit canonique rassemble les paires conjuguées.',
+        keyRule: 'Produit infini d’Euler-Weierstrass',
+      },
+      {
+        stepNumber: 3,
+        title: 'Identifier les coefficients en x²',
+        latexContent: `$$-\\frac{1}{\\pi^2}\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = -\\frac{1}{6}$$`,
+        explanation:
+          'Le terme quadratique du produit provient de la somme des termes $-x^2/(n^2\\pi^2)$.',
+        keyRule: 'Unicité des coefficients analytiques',
+      },
+      {
+        stepNumber: 4,
+        title: 'Conclure pour ζ(2)',
+        latexContent: `$$\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6} \\quad \\blacksquare$$`,
+        explanation:
+          'En multipliant par $-\\pi^2$, on obtient la valeur exacte $\\pi^2/6$.',
+        keyRule: 'Identité de Bâle $\\zeta(2) = \\pi^2/6$',
       },
     ],
   },
 };
 
-export function getLocalizedTopics(lang: Language): Topic[] {
-  if (lang === 'en') return TOPICS;
-  return TOPICS.map((t) => {
-    const fr = TOPIC_FR_MAP[t.slug];
-    return fr ? { ...t, title: fr.title, description: fr.description } : t;
+export function getLocalizedTracks(lang: Language): Track[] {
+  if (lang === 'en') return TRACKS;
+  return TRACKS.map((tr) => {
+    const fr = TRACK_FR_MAP[tr.slug];
+    return fr
+      ? {
+          ...tr,
+          title: fr.title,
+          subtitle: fr.subtitle,
+          description: fr.description,
+        }
+      : tr;
   });
 }
 
@@ -573,6 +553,7 @@ export function getLocalizedExercises(lang: Language): Exercise[] {
       ? {
           ...ex,
           title: fr.title,
+          topicTag: fr.topicTag,
           latexStatement: fr.latexStatement,
           theoremContext: fr.theoremContext,
           solvingSequences: fr.solvingSequences,

@@ -2,23 +2,39 @@
   "entities": {
     "UserAccount": {
       "title": "UserAccount",
-      "description": "Private authenticated user profile and 5-hour cadence schedule state",
+      "description": "Private authenticated user profile, solved proof IDs, aggregate mastery counts, and timer preference",
       "type": "object",
       "properties": {
         "uid": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
         "displayName": { "type": "string", "maxLength": 128 },
         "email": { "type": "string", "maxLength": 256 },
         "photoURL": { "type": "string", "maxLength": 512 },
-        "scheduleStartedAt": { "type": "number" },
-        "scheduleFastForwardHours": { "type": "number" },
+        "solvedExerciseIds": {
+          "type": "array",
+          "items": { "type": "string", "maxLength": 64 }
+        },
+        "verifiedCount": { "type": "number" },
+        "struggledCount": { "type": "number" },
+        "defaultTimerMinutes": { "type": "number" },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["uid", "displayName", "email", "photoURL", "scheduleStartedAt", "scheduleFastForwardHours", "createdAt", "updatedAt"]
+      "required": [
+        "uid",
+        "displayName",
+        "email",
+        "photoURL",
+        "solvedExerciseIds",
+        "verifiedCount",
+        "struggledCount",
+        "defaultTimerMinutes",
+        "createdAt",
+        "updatedAt"
+      ]
     },
-    "Topic": {
-      "title": "Topic",
-      "description": "Mathematics topic category",
+    "Track": {
+      "title": "Track",
+      "description": "Curated proof-based mathematics track",
       "type": "object",
       "properties": {
         "slug": { "type": "string", "maxLength": 64 },
@@ -30,53 +46,31 @@
     },
     "Exercise": {
       "title": "Exercise",
-      "description": "Curated mathematical problem with step-by-step solving sequences",
+      "description": "Curated proof problem with Basic/Advanced level and step-by-step derivation",
       "type": "object",
       "properties": {
-        "topicId": { "type": "string", "maxLength": 64 },
+        "trackId": { "type": "string", "maxLength": 64 },
+        "level": { "type": "string", "enum": ["basic", "advanced"] },
         "title": { "type": "string", "maxLength": 128 },
-        "difficulty": { "type": "string", "enum": ["Beginner", "Intermediate", "Advanced", "Olympiad"] },
         "latexStatement": { "type": "string", "maxLength": 4096 },
         "targetSolution": { "type": "string", "maxLength": 2048 },
-        "hints": { "type": "array" },
         "solvingSequences": { "type": "array" }
       },
-      "required": ["topicId", "title", "difficulty", "latexStatement", "targetSolution", "solvingSequences"]
-    },
-    "HistoryLog": {
-      "title": "HistoryLog",
-      "description": "Record of an authenticated user solving attempt",
-      "type": "object",
-      "properties": {
-        "userId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
-        "exerciseId": { "type": "string", "maxLength": 64 },
-        "exerciseTitle": { "type": "string", "maxLength": 128 },
-        "topicId": { "type": "string", "maxLength": 64 },
-        "outcome": { "type": "string", "enum": ["success", "failed"] },
-        "pointsEarned": { "type": "number" },
-        "timeSpentSeconds": { "type": "number" },
-        "timestamp": { "type": "string", "format": "date-time" },
-        "createdAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["userId", "exerciseId", "exerciseTitle", "topicId", "outcome", "pointsEarned", "timeSpentSeconds", "timestamp", "createdAt"]
+      "required": ["trackId", "level", "title", "latexStatement", "targetSolution", "solvingSequences"]
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": "UserAccount",
-      "description": "Owner-only user profile and cadence settings"
+      "description": "Owner-only user profile, solved proofs list, rank metrics, and timer preference"
     },
-    "/topics/{topicId}": {
-      "schema": "Topic",
-      "description": "Public read-only topics list"
+    "/tracks/{trackId}": {
+      "schema": "Track",
+      "description": "Public read-only tracks list"
     },
     "/exercises/{exerciseId}": {
       "schema": "Exercise",
       "description": "Public read-only curated exercises"
-    },
-    "/history_logs/{logId}": {
-      "schema": "HistoryLog",
-      "description": "Authenticated user problem solving attempts log"
     }
   }
 }

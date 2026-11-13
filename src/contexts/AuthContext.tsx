@@ -10,6 +10,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  deleteField,
   serverTimestamp,
 } from 'firebase/firestore';
 import {
@@ -19,15 +20,23 @@ import {
   handleFirestoreError,
   OperationType,
 } from '../lib/firebase.ts';
-import { getStoredSchedule, saveSchedule } from '../lib/problemSchedule.ts';
+
+export interface CloudProgressState {
+  solvedExerciseIds: string[];
+  verifiedCount: number;
+  struggledCount: number;
+  defaultTimerMinutes: number;
+}
 
 interface UserAccountDoc {
   uid: string;
   displayName: string;
   email: string;
   photoURL: string;
-  scheduleStartedAt: number;
-  scheduleFastForwardHours: number;
+  solvedExerciseIds: string[];
+  verifiedCount: number;
+  struggledCount: number;
+  defaultTimerMinutes: number;
 }
 
 interface AuthContextValue {
@@ -38,8 +47,8 @@ interface AuthContextValue {
   clearAuthError: () => void;
   signInWithGoogle: () => Promise<boolean>;
   signOutUser: () => Promise<void>;
-  syncCloudSchedule: (startedAt: number, fastForwardHours: number) => Promise<void>;
-  cloudSchedule: { startedAt: number; fastForwardHours: number } | null;
+  cloudProgress: CloudProgressState | null;
+  syncCloudProgress: (progress: CloudProgressState) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -68,20 +77,47 @@ function mapAuthError(err: unknown): string {
   return 'Could not complete sign-in. Please try again.';
 }
 
+const LOCAL_GUEST_PROGRESS_KEY = 'mathquest_progress_v2';
+
+function readLocalGuestProgress(): CloudProgressState {
+  try {
+    const raw = localStorage.getItem(LOCAL_GUEST_PROGRESS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return {
+        solvedExerciseIds: Array.isArray(parsed.solvedExerciseIds)
+          ? parsed.solvedExerciseIds.filter((x: unknown) => typeof x === 'string').slice(0, 50)
+          : [],
+        verifiedCount: typeof parsed.verifiedCount === 'number' ? Math.max(0, parsed.verifiedCount) : 0,
+        struggledCount: typeof parsed.struggledCount === 'number' ? Math.max(0, parsed.struggledCount) : 0,
+        defaultTimerMinutes:
+          typeof parsed.defaultTimerMinutes === 'number'
+            ? Math.min(180, Math.max(0, parsed.defaultTimerMinutes))
+            : 15,
+      };
+    }
+  } catch {
+    // ignore storage read errors
+  }
+  return {
+    solvedExerciseIds: [],
+    verifiedCount: 0,
+    struggledCount: 0,
+    defaultTimerMinutes: 15,
+  };
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [cloudSchedule, setCloudSchedule] = useState<{
-    startedAt: number;
-    fastForwardHours: number;
-  } | null>(null);
+  const [cloudProgress, setCloudProgress] = useState<CloudProgressState | null>(null);
 
   const ensureUserProfile = useCallback(async (currentUser: User) => {
     const userPath = `users/${currentUser.uid}`;
     const userRef = doc(db, 'users', currentUser.uid);
-    const localSched = getStoredSchedule();
+    const guestLocal = readLocalGuestProgress();
 
     const safeDisplayName = (currentUser.displayName || 'Mathematician').slice(0, 128);
     const safeEmail = (currentUser.email || '').slice(0, 256);
@@ -90,42 +126,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const snap = await getDoc(userRef);
       if (!snap.exists()) {
-        const newProfile: Record<string, unknown> = {
+        const initial: CloudProgressState = guestLocal;
+        await setDoc(userRef, {
           uid: currentUser.uid,
           displayName: safeDisplayName,
           email: safeEmail,
           photoURL: safePhotoURL,
-          scheduleStartedAt: localSched.startedAt,
-          scheduleFastForwardHours: localSched.fastForwardHours,
+          solvedExerciseIds: initial.solvedExerciseIds,
+          verifiedCount: initial.verifiedCount,
+          struggledCount: initial.struggledCount,
+          defaultTimerMinutes: initial.defaultTimerMinutes,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-        };
-        await setDoc(userRef, newProfile);
-        setCloudSchedule(localSched);
+        });
+        setCloudProgress(initial);
       } else {
         const data = snap.data() as Partial<UserAccountDoc>;
-        const resolvedStartedAt =
-          typeof data.scheduleStartedAt === 'number'
-            ? Math.min(data.scheduleStartedAt, localSched.startedAt)
-            : localSched.startedAt;
-        const resolvedFastForward =
-          typeof data.scheduleFastForwardHours === 'number'
-            ? Math.max(data.scheduleFastForwardHours, localSched.fastForwardHours)
-            : localSched.fastForwardHours;
+        const remoteSolved = Array.isArray(data.solvedExerciseIds)
+          ? data.solvedExerciseIds.filter((x): x is string => typeof x === 'string')
+          : [];
+        const mergedSolved = Array.from(new Set([...remoteSolved, ...guestLocal.solvedExerciseIds])).slice(0, 50);
+        const mergedVerified = Math.max(
+          typeof data.verifiedCount === 'number' ? data.verifiedCount : 0,
+          guestLocal.verifiedCount,
+          mergedSolved.length
+        );
+        const mergedStruggled = Math.max(
+          typeof data.struggledCount === 'number' ? data.struggledCount : 0,
+          guestLocal.struggledCount
+        );
+        const resolvedTimer =
+          typeof data.defaultTimerMinutes === 'number'
+            ? Math.min(180, Math.max(0, data.defaultTimerMinutes))
+            : guestLocal.defaultTimerMinutes;
 
-        // Sync merged schedule locally and back to user doc
-        saveSchedule(resolvedStartedAt, resolvedFastForward);
-        setCloudSchedule({
-          startedAt: resolvedStartedAt,
-          fastForwardHours: resolvedFastForward,
-        });
+        const mergedProgress: CloudProgressState = {
+          solvedExerciseIds: mergedSolved,
+          verifiedCount: mergedVerified,
+          struggledCount: mergedStruggled,
+          defaultTimerMinutes: resolvedTimer,
+        };
+
+        setCloudProgress(mergedProgress);
 
         await updateDoc(userRef, {
           displayName: safeDisplayName,
           email: safeEmail,
           photoURL: safePhotoURL,
-          scheduleStartedAt: resolvedStartedAt,
-          scheduleFastForwardHours: resolvedFastForward,
+          solvedExerciseIds: mergedSolved,
+          verifiedCount: mergedVerified,
+          struggledCount: mergedStruggled,
+          defaultTimerMinutes: resolvedTimer,
+          scheduleStartedAt: deleteField(),
+          scheduleFastForwardHours: deleteField(),
           updatedAt: serverTimestamp(),
         });
       }
@@ -149,7 +202,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.error(e);
         }
       } else {
-        setCloudSchedule(null);
+        setCloudProgress(null);
       }
     });
 
@@ -175,30 +228,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuthError(null);
     try {
       await signOut(auth);
-      setCloudSchedule(null);
+      setCloudProgress(null);
     } catch (error) {
       setAuthError(mapAuthError(error));
     }
   }, []);
 
-  const syncCloudSchedule = useCallback(
-    async (startedAt: number, fastForwardHours: number) => {
+  const syncCloudProgress = useCallback(
+    async (progress: CloudProgressState) => {
       if (!user) return;
       const userPath = `users/${user.uid}`;
       const userRef = doc(db, 'users', user.uid);
+      const boundedSolved = progress.solvedExerciseIds.slice(0, 50);
+      const safeTimer = Math.min(180, Math.max(0, Math.round(progress.defaultTimerMinutes)));
       try {
         await updateDoc(userRef, {
-          scheduleStartedAt: startedAt,
-          scheduleFastForwardHours: fastForwardHours,
+          solvedExerciseIds: boundedSolved,
+          verifiedCount: Math.max(0, Math.round(progress.verifiedCount)),
+          struggledCount: Math.max(0, Math.round(progress.struggledCount)),
+          defaultTimerMinutes: safeTimer,
+          scheduleStartedAt: deleteField(),
+          scheduleFastForwardHours: deleteField(),
           updatedAt: serverTimestamp(),
         });
-        setCloudSchedule({ startedAt, fastForwardHours });
+        setCloudProgress({
+          solvedExerciseIds: boundedSolved,
+          verifiedCount: Math.max(0, Math.round(progress.verifiedCount)),
+          struggledCount: Math.max(0, Math.round(progress.struggledCount)),
+          defaultTimerMinutes: safeTimer,
+        });
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
         if (msg.includes('Missing or insufficient permissions') || msg.includes('permission-denied')) {
           handleFirestoreError(error, OperationType.UPDATE, userPath);
         }
-        console.warn('Cloud schedule update deferred:', error);
+        console.warn('Cloud progress update deferred:', error);
       }
     },
     [user]
@@ -216,8 +280,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clearAuthError,
         signInWithGoogle,
         signOutUser,
-        syncCloudSchedule,
-        cloudSchedule,
+        cloudProgress,
+        syncCloudProgress,
       }}
     >
       {children}
